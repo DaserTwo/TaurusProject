@@ -104,4 +104,37 @@ Elements:
         <td>Swaps two indexes (index id1 and index id2)</td>
       </tr>
     </table>
+    <table>
+      <p>List of predefined varibles</p>
+      <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+      <tr>
+        <td>0</td>
+        <td>$</td>
+        <td>Alias of _get</td>
+      </tr>
+      <tr>
+        <td>1</td>
+        <td>_get</td>
+        <td>result register</td>
+      </tr>
+      <tr>
+        <td>2</td>
+        <td>_top</td>
+        <td>referention to the top of memory stack</td>
+      </tr>
+      <tr>
+        <td>3</td>
+        <td>_true</td>
+        <td>VAR_BOOL true ("1") const varible</td>
+      </tr>
+      <tr>
+        <td>4</td>
+        <td>_false</td>
+        <td>VAR_BOOL false ("0") const varible</td>
+      </tr>
+    </table>
 </ol>
