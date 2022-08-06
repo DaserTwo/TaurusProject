@@ -22,6 +22,10 @@ namespace memory{
                 return var_type();
             }
             return memory_stack.top();
+        } else if(name == "_true"){
+            return var_type(defs::VAR_BOOL, "1");
+        } else if(name == "_false"){
+            return var_type(defs::VAR_BOOL, "0");
         } else if(name[0] == '$'){
             string index = name.substr(1);
             if(index.empty()){
@@ -40,5 +44,17 @@ namespace memory{
             get_var_error = true;
             return var_type();
         }
+    }
+
+    bool set_index(unsigned long long id, var_type v){
+        if(index_memory.size() > id){
+            index_memory[id] = v;
+        } else if(index_memory.size() == id){
+            index_memory.push_back(v);
+        } else{
+            printf("Index $%lli is not inited\n", id);
+            return false;
+        }
+        return true;
     }
 }

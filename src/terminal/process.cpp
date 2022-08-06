@@ -12,7 +12,7 @@ using namespace defs;
 
 namespace process{
     stack<pair<arg_type, string>> arg_stack;
-    string key_words[] = {"exit", "putn", "puts", "push", "pop", "get", "index"};
+    string key_words[] = {"exit", "putn", "puts", "push", "pop", "get", "index", "pushi", "popi", "sizei", "swapi"};
 
     void processInput(string input){
         if(input.empty())
@@ -230,7 +230,7 @@ namespace process{
             }
         } else if(cmd == "putn"){
             if(arg_stack.size() == 0){
-                printf("Excepted number (putn [n:NUM]) or (putn [n:DOT])\n");
+                printf("Excepted number (putn REL])\n");
             } else if(arg_stack.size() == 1){
                 memory::var_type buffer;
                 if(arg_stack.top().first == ARG_VAR){
@@ -239,20 +239,20 @@ namespace process{
                         return;
                     }
                 } else{
-                    buffer = memory::var_type((defs::var_type)arg_stack.top().first, arg_stack.top().second);
+                    buffer = memory::var_type((var_type)arg_stack.top().first, arg_stack.top().second);
                 }
 
-                if(buffer.first == defs::VAR_NUM){
+                if(buffer.first == VAR_NUM || VAR_BOOL){
                     long long n = stoll(buffer.second);
-                    printf("%lli\n", n);
-                } else if(buffer.first == defs::VAR_DOT){
+                    printf("%lli", n);
+                } else if(buffer.first == VAR_DOT){
                     long double n = stold(buffer.second);
-                    printf("%Lf\n", n);
+                    printf("%Lf", n);
                 } else{
-                    printf("Excepted number (putn [n:NUM]) or (putn [n:DOT])\n");
+                    printf("Excepted number (putn [n:REL])\n");
                 }
             } else{
-                printf("Too many arguments (putn [n:NUM]) or (putn [n:DOT])\n");
+                printf("Too many arguments (putn [n:REL])\n");
             }
         } else if(cmd == "puts"){
             if(arg_stack.size() == 0){
@@ -260,22 +260,24 @@ namespace process{
             } else if(arg_stack.size() == 1){
                 if(arg_stack.top().first == ARG_STR){
                     string s = common::clear_str_format(arg_stack.top().second);
-                    printf("%s\n", s.c_str());
+                    printf("%s", s.c_str());
                 } else if(arg_stack.top().first == ARG_VAR){
                     memory::var_type buffer = memory::get_var(arg_stack.top().second);
                     if(memory::get_var_error){
                         return;
-                    } else if(buffer.first != defs::VAR_STR){
+                    } else if(buffer.first == VAR_BOOL){
+                        printf("%s", (buffer.second == "0")?"false":"true");
+                    } else if(buffer.first != VAR_STR){
                         printf("Excepted string (puts [s:STR])\n");
                         return;
                     }
                     string s = common::clear_str_format(buffer.second);
-                    printf("%s\n", s.c_str());
+                    printf("%s", s.c_str());
                 } else{
                     printf("Excepted string (puts [s:STR])\n");
                 }
             } else{
-                printf("Too many arguments (putn [n:NUM]) or (putn [n:DOT])\n");
+                printf("Too many arguments (puts [s:STR])\n");
             }
         } else if(cmd == "push"){
             if(arg_stack.size() == 0){
@@ -329,15 +331,8 @@ namespace process{
 
                 if(memory::memory_stack.empty()){
                     printf("Memory stack is empty\n");
-                } else if(memory::index_memory.size() > id){
-                    memory::index_memory[id] = memory::memory_stack.top();
-                } else if(memory::index_memory.size() == id){
-                    memory::index_memory.push_back(memory::memory_stack.top());
                 } else{
-                    while(memory::index_memory.size() < id){
-                        memory::index_memory.push_back(memory::var_type());
-                    }
-                    memory::index_memory.push_back(memory::memory_stack.top());
+                    memory::set_index(id, memory::memory_stack.top());
                 }
             } else{
                 printf("Too many arguments (get [void]) or (get [id:NUM])\n");
@@ -395,18 +390,105 @@ namespace process{
                     return;
                 }
 
-                if(memory::index_memory.size() > id){
-                    memory::index_memory[id] = v;
-                } else if(memory::index_memory.size() == id){
-                    memory::index_memory.push_back(v);
-                } else{
-                    while(memory::index_memory.size() < id){
-                        memory::index_memory.push_back(memory::var_type());
-                    }
-                    memory::index_memory.push_back(v);
-                }
+                memory::set_index(id, v);
             } else{
                 printf("Too many arguments (index [id:NUM]) or (index [id:NUM] [v:ANY])\n");
+            }
+        } else if(cmd == "pushi"){
+            if(arg_stack.size() == 0){
+                printf("Too few arguments (pushi [v:ANY])\n");
+            } else if(arg_stack.size() == 1){
+                if(arg_stack.top().first == ARG_VAR){
+                    memory::index_memory.push_back(memory::get_var(arg_stack.top().second));
+                    if(memory::get_var_error){
+                        memory::index_memory.pop_back();
+                    }
+                } else{
+                    memory::index_memory.push_back(memory::var_type((var_type)arg_stack.top().first, arg_stack.top().second));
+                }
+            } else{
+                printf("Too many arguments (pushi [v:ANY])\n");
+            }
+        } else if(cmd == "popi"){
+            if(arg_stack.size() == 0){
+                if(memory::index_memory.empty()){
+                    printf("There is no inited index\n");
+                } else{
+                    memory::index_memory.pop_back();
+                }
+            } else{
+                printf("Too many arguments (popi [VOID])\n");
+            }
+        } else if(cmd == "sizei"){
+            if(arg_stack.size() == 0){
+                memory::_get = memory::var_type(VAR_NUM, to_string(memory::index_memory.size()));
+            } else if(arg_stack.size() == 1){
+                if(arg_stack.top().first == ARG_NUM){
+                    memory::set_index(stoll(arg_stack.top().second), memory::var_type(VAR_NUM, to_string(memory::index_memory.size())));
+                } else if(arg_stack.top().first == ARG_NUM){
+                    memory::var_type id = memory::get_var(arg_stack.top().second);
+                    if(memory::get_var_error){
+                        return;
+                    } else if(id.first == VAR_NUM){
+                        memory::set_index(stoll(id.second), memory::var_type(VAR_NUM, to_string(memory::index_memory.size())));
+                    } else{
+                        printf("Excepted number (sizei [VOID]) or (sizei [id:NUM])\n");
+                    }
+                } else{
+                    printf("Excepted number (sizei [VOID]) or (sizei [id:NUM])\n");
+                }
+            } else{
+                printf("Too many arguments (sizei [VOID]) or (sizei [id:NUM])\n");
+            }
+        } else if(cmd == "swapi"){
+            if(arg_stack.size() <= 1){
+                printf("Too few arguments (sizei [id1:NUM] [id2:NUM])\n");
+            } else if(arg_stack.size() == 2){
+                unsigned long long id1;
+                unsigned long long id2;
+
+                if(arg_stack.top().first == ARG_NUM){
+                    id2 = stoll(arg_stack.top().second);
+                } else if(arg_stack.top().first == ARG_VAR){
+                    memory::var_type i = memory::get_var(arg_stack.top().second);
+                    if(memory::get_var_error){
+                        return;
+                    } else if(i.first == VAR_NUM){
+                        id2 = stoll(i.second);
+                    } else{
+                        printf("Excepted number (swapi [id1:NUM] [id2:NUM])\n");
+                        return;
+                    }
+                }   else{
+                    printf("Excepted number (swapi [id1:NUM] [id2:NUM])\n");
+                    return;
+                }
+
+                arg_stack.pop();
+
+                if(arg_stack.top().first == ARG_NUM){
+                    id1 = stoll(arg_stack.top().second);
+                } else if(arg_stack.top().first == ARG_VAR){
+                    memory::var_type i = memory::get_var(arg_stack.top().second);
+                    if(memory::get_var_error){
+                        return;
+                    } else if(i.first == VAR_NUM){
+                        id1 = stoll(i.second);
+                    } else{
+                        printf("Excepted number (swapi [id1:NUM] [id2:NUM])\n");
+                        return;
+                    }
+                }   else{
+                    printf("Excepted number (swapi [id1:NUM] [id2:NUM])\n");
+                    return;
+                }
+
+                memory::var_type i1v = memory::get_var("$" + to_string(id1)); if(memory::get_var_error) return;
+                memory::var_type i2v = memory::get_var("$" + to_string(id2)); if(memory::get_var_error) return;
+                if(!memory::set_index(id1, i2v)) return;
+                if(!memory::set_index(id2, i1v)) return;
+            } else{
+                printf("Too many arguments (sizei [id1:NUM] [id2:NUM])\n");
             }
         }
         else{

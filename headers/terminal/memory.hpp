@@ -15,4 +15,6 @@ namespace memory{
 
     extern bool get_var_error;
     var_type get_var(std::string name);
+
+    bool set_index(unsigned long long id, var_type v);
 }
