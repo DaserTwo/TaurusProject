@@ -605,7 +605,7 @@ namespace process{
             }
         } else if(cmd == "sub"){
             if(arg_stack.size() <= 1){
-                printf("Too few arguments (sub {id:NUM} [v1:REL] [v2:REL]) or (sub {id:NUM} [v1:STR] [begin:NUM] {[end:NUM]})\n");
+                printf("Too few arguments (sub {id:NUM} [v1:REL] [v2:REL]) or (sub {id:NUM} [v1:STR] [begin:NUM] {end:NUM})\n");
             } else if(arg_stack.size() == 2){
                 memory::var_type v1;
                 memory::var_type v2;
@@ -635,7 +635,7 @@ namespace process{
                             memory::_get = memory::var_type(VAR_STR, "'" + str.substr(begin) + "'");
                         }
                     } else{
-                        printf("Excepted number (sub {id:NUM} [v1:REL] [v2:REL]) or (sub {id:NUM} [v1:STR] [begin:NUM] {[end:NUM]})\n");
+                        printf("Excepted number (sub {id:NUM} [v1:REL] [v2:REL]) or (sub {id:NUM} [v1:STR] [begin:NUM] {end:NUM})\n");
                     }
                 } else if(v1.first == VAR_NUM){
                     if(v2.first == VAR_NUM){
@@ -643,16 +643,16 @@ namespace process{
                     } else if(v2.first == VAR_DOT){
                         memory::_get = memory::var_type(VAR_DOT, to_string(stoll(v1.second) - stold(v2.second)));
                     } else{
-                        printf("Bad argument (sub {id:NUM} [v1:REL] [v2:REL]) or (sub {id:NUM} [v1:STR] [begin:NUM] {[end:NUM]})\n");
+                        printf("Bad argument (sub {id:NUM} [v1:REL] [v2:REL]) or (sub {id:NUM} [v1:STR] [begin:NUM] {end:NUM})\n");
                     }
                 } else if(v1.first == VAR_DOT){
                     if(v2.first == VAR_NUM || v2.first == VAR_DOT){
                         memory::_get = memory::var_type(VAR_DOT, to_string(stold(v1.second) - stold(v2.second)));
                     } else{
-                        printf("Bad argument (sub {id:NUM} [v1:REL] [v2:REL]) or (sub {id:NUM} [v1:STR] [begin:NUM] {[end:NUM]})\n");
+                        printf("Bad argument (sub {id:NUM} [v1:REL] [v2:REL]) or (sub {id:NUM} [v1:STR] [begin:NUM] {end:NUM})\n");
                     }
                 } else{
-                    printf("Bad argument (sub {id:NUM} [v1:REL] [v2:REL]) or (sub {id:NUM} [v1:STR] [begin:NUM] {[end:NUM]})\n");
+                    printf("Bad argument (sub {id:NUM} [v1:REL] [v2:REL]) or (sub {id:NUM} [v1:STR] [begin:NUM] {end:NUM})\n");
                 }
             } else if(arg_stack.size() == 3){
                 memory::var_type v1;
@@ -696,10 +696,10 @@ namespace process{
                                 memory::_get = memory::var_type(VAR_STR, "'" + str.substr(begin, end) + "'");
                             }
                         } else{
-                            printf("Excepted number (sub {id:NUM} [v1:REL] [v2:REL]) or (sub {id:NUM} [v1:STR] [begin:NUM] {[end:NUM]})\n");
+                            printf("Excepted number (sub {id:NUM} [v1:REL] [v2:REL]) or (sub {id:NUM} [v1:STR] [begin:NUM] {end:NUM})\n");
                         }
                     } else{
-                        printf("Excepted number (sub {id:NUM} [v1:REL] [v2:REL]) or (sub {id:NUM} [v1:STR] [begin:NUM] {[end:NUM]})\n");
+                        printf("Excepted number (sub {id:NUM} [v1:REL] [v2:REL]) or (sub {id:NUM} [v1:STR] [begin:NUM] {end:NUM})\n");
                     }
                 } else if(v1.first == VAR_NUM){
                     unsigned long long id = stoll(v1.second);
@@ -713,7 +713,7 @@ namespace process{
                                 memory::set_index(id, memory::var_type(VAR_STR, "'" + str.substr(begin) + "'"));
                             }
                         } else{
-                            printf("Excepted number (sub {id:NUM} [v1:REL] [v2:REL]) or (sub {id:NUM} [v1:STR] [begin:NUM] {[end:NUM]})\n");
+                            printf("Excepted number (sub {id:NUM} [v1:REL] [v2:REL]) or (sub {id:NUM} [v1:STR] [begin:NUM] {end:NUM})\n");
                         }
                     } else if(v2.first == VAR_NUM){
                         if(v3.first == VAR_NUM){
@@ -721,19 +721,19 @@ namespace process{
                         } else if(v3.first == VAR_DOT){
                             memory::set_index(id, memory::var_type(VAR_NUM, to_string(stoll(v2.second) - stold(v3.second))));
                         } else{
-                            printf("Bad argument (sub {id:NUM} [v1:REL] [v2:REL]) or (sub {id:NUM} [v1:STR] [begin:NUM] {[end:NUM]})\n");
+                            printf("Bad argument (sub {id:NUM} [v1:REL] [v2:REL]) or (sub {id:NUM} [v1:STR] [begin:NUM] {end:NUM})\n");
                         }
                     } else if(v2.first == VAR_DOT){
                         if(v3.first == VAR_NUM || v3.first == VAR_DOT){
                             memory::set_index(id, memory::var_type(VAR_DOT, to_string(stold(v2.second) - stold(v3.second))));
                         } else{
-                            printf("Bad argument (sub {id:NUM} [v1:REL] [v2:REL]) or (sub {id:NUM} [v1:STR] [begin:NUM] {[end:NUM]})\n");
+                            printf("Bad argument (sub {id:NUM} [v1:REL] [v2:REL]) or (sub {id:NUM} [v1:STR] [begin:NUM] {end:NUM})\n");
                         }
                     } else{
-                        printf("Bad argument (sub {id:NUM} [v1:REL] [v2:REL]) or (sub {id:NUM} [v1:STR] [begin:NUM] {[end:NUM]})\n");
+                        printf("Bad argument (sub {id:NUM} [v1:REL] [v2:REL]) or (sub {id:NUM} [v1:STR] [begin:NUM] {end:NUM})\n");
                     }
                 } else{
-                    printf("Bad argument (sub {id:NUM} [v1:REL] [v2:REL]) or (sub {id:NUM} [v1:STR] [begin:NUM] {[end:NUM]})\n");
+                    printf("Bad argument (sub {id:NUM} [v1:REL] [v2:REL]) or (sub {id:NUM} [v1:STR] [begin:NUM] {end:NUM})\n");
                 }
             } else if(arg_stack.size() == 4){
                 unsigned long long id = 0;
@@ -773,11 +773,11 @@ namespace process{
                     else if(v.first == VAR_NUM){
                         id = stoll(v.second);
                     } else{
-                        printf("Bad argument (sub {id:NUM} [v1:REL] [v2:REL]) or (sub {id:NUM} [v1:STR] [begin:NUM] {[end:NUM]})\n");
+                        printf("Bad argument (sub {id:NUM} [v1:REL] [v2:REL]) or (sub {id:NUM} [v1:STR] [begin:NUM] {end:NUM})\n");
                         return;
                     }
                 } else{
-                    printf("Bad argument (sub {id:NUM} [v1:REL] [v2:REL]) or (sub {id:NUM} [v1:STR] [begin:NUM] {[end:NUM]})\n");
+                    printf("Bad argument (sub {id:NUM} [v1:REL] [v2:REL]) or (sub {id:NUM} [v1:STR] [begin:NUM] {end:NUM})\n");
                     return;
                 }
 
@@ -794,17 +794,17 @@ namespace process{
                             memory::set_index(id, memory::var_type(VAR_STR, "'" + s.substr(b, e) + "'"));
                         }
                     } else{
-                        printf("Excepted number (sub {id:NUM} [v1:REL] [v2:REL]) or (sub {id:NUM} [v1:STR] [begin:NUM] {[end:NUM]})\n");
+                        printf("Excepted number (sub {id:NUM} [v1:REL] [v2:REL]) or (sub {id:NUM} [v1:STR] [begin:NUM] {end:NUM})\n");
                     }
                 } else{
-                    printf("Excepted string (sub {id:NUM} [v1:REL] [v2:REL]) or (sub {id:NUM} [v1:STR] [begin:NUM] {[end:NUM]})\n");
+                    printf("Excepted string (sub {id:NUM} [v1:REL] [v2:REL]) or (sub {id:NUM} [v1:STR] [begin:NUM] {end:NUM})\n");
                 }
             } else{
-                printf("Too many arguments (sub {id:NUM} [v1:REL] [v2:REL]) or (sub {id:NUM} [v1:STR] [begin:NUM] {[end:NUM]})\n");
+                printf("Too many arguments (sub {id:NUM} [v1:REL] [v2:REL]) or (sub {id:NUM} [v1:STR] [begin:NUM] {end:NUM})\n");
             }
         } else if(cmd == "mul"){
             if(arg_stack.size() <= 1){
-                printf("Too few arguments (mul {id:NUM} [v1:REL] [v2:REL]) or (mul {id:NUM} [v1:STR] [v2:NUM])\n");
+                printf("Too few arguments (mul {id:NUM} [v1:REL] [v2:REL]) or (mul {id:NUM} [str:STR] [times:NUM])\n");
             } else if(arg_stack.size() == 2){
                 memory::var_type v1;
                 memory::var_type v2;
@@ -834,7 +834,7 @@ namespace process{
                         }
                         memory::_get = memory::var_type(VAR_STR, get + "'");
                     } else{
-                        printf("Excepted number (mul {id:NUM} [v1:REL] [v2:REL]) or (mul {id:NUM} [v1:STR] [v2:NUM])\n");
+                        printf("Excepted number (mul {id:NUM} [v1:REL] [v2:REL]) or (mul {id:NUM} [str:STR] [times:NUM])\n");
                     }
                 } else if(v1.first == VAR_NUM){
                     if(v2.first == VAR_NUM){
@@ -842,16 +842,16 @@ namespace process{
                     } else if(v2.first == VAR_DOT){
                         memory::_get = memory::var_type(VAR_DOT, to_string(stoll(v1.second) * stold(v2.second)));
                     } else{
-                        printf("Bad argument (mul {id:NUM} [v1:REL] [v2:REL]) or (mul {id:NUM} [v1:STR] [v2:NUM])\n");
+                        printf("Bad argument (mul {id:NUM} [v1:REL] [v2:REL]) or (mul {id:NUM} [str:STR] [times:NUM])\n");
                     }
                 } else if(v1.first == VAR_DOT){
                     if(v2.first == VAR_NUM || v2.first == VAR_DOT){
                         memory::_get = memory::var_type(VAR_DOT, to_string(stoll(v1.second) * stoll(v2.second)));
                     } else{
-                        printf("Bad argument (mul {id:NUM} [v1:REL] [v2:REL]) or (mul {id:NUM} [v1:STR] [v2:NUM])\n");
+                        printf("Bad argument (mul {id:NUM} [v1:REL] [v2:REL]) or (mul {id:NUM} [str:STR] [times:NUM])\n");
                     }
                 } else{
-                    printf("Bad argument (mul {id:NUM} [v1:REL] [v2:REL]) or (mul {id:NUM} [v1:STR] [v2:NUM])\n");
+                    printf("Bad argument (mul {id:NUM} [v1:REL] [v2:REL]) or (mul {id:NUM} [str:STR] [times:NUM])\n");
                 }
             } else if(arg_stack.size() == 3){
                 memory::var_type v1;
@@ -882,11 +882,11 @@ namespace process{
                     else if(v.first == VAR_NUM){
                         id = stoll(v.second);
                     } else{
-                        printf("Bad argument (mul {id:NUM} [v1:REL] [v2:REL]) or (mul {id:NUM} [v1:STR] [v2:NUM])\n");
+                        printf("Bad argument (mul {id:NUM} [v1:REL] [v2:REL]) or (mul {id:NUM} [str:STR] [times:NUM])\n");
                         return;
                     }
                 } else{
-                    printf("Bad argument (mul {id:NUM} [v1:REL] [v2:REL]) or (mul {id:NUM} [v1:STR] [v2:NUM])\n");
+                    printf("Bad argument (mul {id:NUM} [v1:REL] [v2:REL]) or (mul {id:NUM} [str:STR] [times:NUM])\n");
                     return;
                 }
 
@@ -900,7 +900,7 @@ namespace process{
                         }
                         memory::set_index(id, memory::var_type(VAR_STR, get + "'"));
                     } else{
-                        printf("Excepted number (mul {id:NUM} [v1:REL] [v2:REL]) or (mul {id:NUM} [v1:STR] [v2:NUM])\n");
+                        printf("Excepted number (mul {id:NUM} [v1:REL] [v2:REL]) or (mul {id:NUM} [str:STR] [times:NUM])\n");
                     }
                 } else if(v1.first == VAR_NUM){
                     if(v2.first == VAR_NUM){
@@ -908,22 +908,21 @@ namespace process{
                     } else if(v2.first == VAR_DOT){
                         memory::set_index(id, memory::var_type(VAR_DOT, to_string(stoll(v1.second) * stold(v2.second))));
                     } else{
-                        printf("Bad argument (mul {id:NUM} [v1:REL] [v2:REL]) or (mul {id:NUM} [v1:STR] [v2:NUM])\n");
+                        printf("Bad argument (mul {id:NUM} [v1:REL] [v2:REL]) or (mul {id:NUM} [str:STR] [times:NUM])\n");
                     }
                 } else if(v1.first == VAR_DOT){
                     if(v2.first == VAR_NUM || v2.first == VAR_DOT){
                         memory::set_index(id, memory::var_type(VAR_DOT, to_string(stoll(v1.second) * stoll(v2.second))));
                     } else{
-                        printf("Bad argument (mul {id:NUM} [v1:REL] [v2:REL]) or (mul {id:NUM} [v1:STR] [v2:NUM])\n");
+                        printf("Bad argument (mul {id:NUM} [v1:REL] [v2:REL]) or (mul {id:NUM} [str:STR] [times:NUM])\n");
                     }
                 } else{
-                    printf("Bad argument (mul {id:NUM} [v1:REL] [v2:REL]) or (mul {id:NUM} [v1:STR] [v2:NUM])\n");
+                    printf("Bad argument (mul {id:NUM} [v1:REL] [v2:REL]) or (mul {id:NUM} [str:STR] [times:NUM])\n");
                 }
             } else{
-                printf("Too many arguments (mul {id:NUM} [v1:REL] [v2:REL]) or (mul {id:NUM} [v1:STR] [v2:NUM])\n");
+                printf("Too many arguments (mul {id:NUM} [v1:REL] [v2:REL]) or (mul {id:NUM} [str:STR] [times:NUM])\n");
             }
         } else if(cmd == "div"){
-            //TODO!!! div
             if(arg_stack.size() <= 1){
                 printf("Too few arguments (div {id:NUM} [v1:REL] [v2:REL])\n");
             } else if(arg_stack.size() == 2){
@@ -1020,7 +1019,6 @@ namespace process{
                 printf("Too many arguments (div {id:NUM} [v1:REL] [v2:REL])\n");
             }
         } else if(cmd == "mod"){
-            //TODO!!! mod
             if(arg_stack.size() <= 1){
                 printf("Too few arguments (mod {id:NUM} [v1:NUM] [v2:NUM])\n");
             } else if(arg_stack.size() == 2){
