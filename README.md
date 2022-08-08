@@ -52,56 +52,92 @@ Elements:
       <tr>
         <td>6</td>
         <td>get</td>
-        <td>[VOID]</td>
-        <td>Gets the top value from the memory stack and puts it to _get varible</td>
+        <td>{id:NUM}</td>
+        <td>Gets the top value from the memory stack and puts it to the index of id or _get varible</td>
       </tr>
       <tr>
         <td>7</td>
-        <td>get</td>
-        <td>[id:NUM]</td>
-        <td>Gets the top value from the memory stack and puts it to the index of id</td>
-      </tr>
-      <tr>
-        <td>8</td>
         <td>index</td>
         <td>[id:NUM]</td>
         <td>Gets the value from index id and puts it to _get varible</td>
       </tr>
       <tr>
-        <td>9</td>
+        <td>8</td>
         <td>index</td>
         <td>[id:NUM] [v:ANY]</td>
         <td>Puts the v value to the id index</td>
       </tr>
       <tr>
-        <td>10</td>
+        <td>9</td>
         <td>pushi</td>
         <td>[v:ANY]</td>
         <td>Inits new index with v value and biggest id</td>
       </tr>
       <tr>
-        <td>11</td>
+        <td>10</td>
         <td>popi</td>
         <td>[VOID]</td>
         <td>Deletes the biggest index</td>
       </tr>
       <tr>
+        <td>11</td>
+        <td>sizei</td>
+        <td>{id:NUM}</td>
+        <td>Gets size of indexed memory and puts it into index id or _get varible</td>
+      </tr>
+      <tr>
         <td>12</td>
-        <td>sizei</td>
-        <td>[VOID]</td>
-        <td>Gets size of indexed memory and puts it into _get</td>
-      </tr>
-      <tr>
-        <td>13</td>
-        <td>sizei</td>
-        <td>[id:NUM]</td>
-        <td>Gets size of indexed memory and puts it into index id</td>
-      </tr>
-      <tr>
-        <td>14</td>
         <td>swapi</td>
         <td>[id1:NUM] [id2:NUM]</td>
         <td>Swaps two indexes (index id1 and index id2)</td>
+      </tr>
+      <tr>
+        <td>13</td>
+        <td>add</td>
+        <td>{id:NUM} [v1:REL] [v2:REL]</td>
+        <td>Adds v1 and v2 and puts result into index id or _get varible</td>
+      </tr>
+      <tr>
+        <td>14</td>
+        <td>add</td>
+        <td>{id:NUM} [v1:STR] [v2:ANY]</td>
+        <td>Adds v2 to v1 and puts result into index id or _get varible</td>
+      </tr>
+      <tr>
+        <td>15</td>
+        <td>sub</td>
+        <td>{id:NUM} [v1:REL] [v2:REL]</td>
+        <td>Substrats v1 and v2 and puts result into index id or _get varible</td>
+      </tr>
+      <tr>
+        <td>16</td>
+        <td>sub</td>
+        <td>{id:NUM} [str:STR] [begin:NUM] {end:NUM}</td>
+        <td>Puts the value of str from begin to end or str.length - 1 into index id or _get varible</td>
+      </tr>
+      <tr>
+        <td>17</td>
+        <td>mul</td>
+        <td>{id:NUM} [v1:REL] [v2:REL]</td>
+        <td>Multibles v1 and v2 and puts result into index id or _get varible</td>
+      </tr>
+      <tr>
+        <td>18</td>
+        <td>mul</td>
+        <td>{id:NUM} [str:STR] [times:NUM]</td>
+        <td>Multiples str by times and puts result into index id or _get varible</td>
+      </tr>
+      <tr>
+        <td>19</td>
+        <td>div</td>
+        <td>{id:NUM} [v1:REL] [v2:REL]</td>
+        <td>Divides v1 by v2 and puts result into index id or _get varible</td>
+      </tr>
+      <tr>
+        <td>20</td>
+        <td>mod</td>
+        <td>{id:NUM} [v1:REL] [v2:REL]</td>
+        <td>Puts modulo v1 by v2 into index id or _get varible</td>
       </tr>
     </table>
     <table>
