@@ -1,23 +1,23 @@
-#pragma once
+#include <common/common.hpp>
 
-#include <string>
+using namespace std;
 
 namespace common{
-    bool is_num(char c);/*{
+    bool is_num(char c){
         return ((c >= '1' && c <= '9') || c == '0');
-    }*/
+    }
 
-    std::string str_to_lower(std::string s);/*{
-        std::string ret = "";
+    string str_to_lower(string s){
+        string ret = "";
         for(char c : s){
             ret += tolower(c);
         }
         return ret;
-    }*/
+    }
 
-    std::string clear_str_format(std::string s);/*{
-        std::string ret = "";
-        std::string buffer = s.substr(1, s.length() - 2);
+    string clear_str_format(string s){
+        string ret = "";
+        string buffer = s.substr(1, s.length() - 2);
         bool slash = false;
         for(char c : buffer){
             if(slash){
@@ -41,5 +41,5 @@ namespace common{
             }
         }
         return ret;
-    }*/
+    }
 }

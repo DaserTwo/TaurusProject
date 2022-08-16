@@ -2,16 +2,17 @@
 
 namespace defs{
     typedef enum{
-        ARG_NUM,
+        ARG_INT,
         ARG_DOT,
         ARG_STR,
         ARG_VAR
     } arg_type;
 
     typedef enum{
-        VAR_NUM = ARG_NUM,
+        VAR_INT = ARG_INT,
         VAR_DOT = ARG_DOT,
         VAR_STR = ARG_STR,
-        VAR_BOOL
+        VAR_BOOL,
+        VAR_TYPE
     } var_type;
 }

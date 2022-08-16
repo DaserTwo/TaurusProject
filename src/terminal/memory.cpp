@@ -5,7 +5,7 @@
 using namespace std;
 
 namespace memory{
-    var_type _get = var_type(defs::VAR_NUM, "0");
+    var_type _get = var_type(defs::VAR_INT, "0");
     stack<var_type> memory_stack;
     vector<var_type> index_memory;
 
@@ -26,6 +26,16 @@ namespace memory{
             return var_type(defs::VAR_BOOL, "1");
         } else if(name == "_false"){
             return var_type(defs::VAR_BOOL, "0");
+        } else if(name == "_int"){
+            return var_type(defs::VAR_TYPE, "0");
+        } else if(name == "_dot"){
+            return var_type(defs::VAR_TYPE, "1");
+        } else if(name == "_str"){
+            return var_type(defs::VAR_TYPE, "2");
+        } else if(name == "_bool"){
+            return var_type(defs::VAR_TYPE, "3");
+        } else if(name == "_type"){
+            return var_type(defs::VAR_TYPE, "4");
         } else if(name[0] == '$'){
             string index = name.substr(1);
             if(index.empty()){

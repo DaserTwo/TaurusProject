@@ -15,7 +15,7 @@ clean:
 
 $(out):
 	@echo Linking...
-	@g++ bin/terminal.*.o -o $@.terminal $(std)
+	@g++ bin/terminal.*.o bin/common.*.o -o $@.terminal $(std)
 
 $(src):
 	@echo Compiling $(patsubst _src/%,%, $@)
