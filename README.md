@@ -144,6 +144,42 @@ Elements:
         <td>{id:INT} [v:ANY]</td>
         <td>Returns v's type into index id or _get variable</td>
       </tr>
+      <tr>
+        <td>22</td>
+        <td>at</td>
+        <td>{id:INT} [s:STR] [index:INT]</td>
+        <td>Returns s[index] into index id or _get variable</td>
+      </tr>
+      <tr>
+        <td>23</td>
+        <td>rel</td>
+        <td>{id:INT} [v:ANY]</td>
+        <td>Returns v projection to INT or DOT type into index id or _get variable</td>
+      </tr>
+      <tr>
+        <td>24</td>
+        <td>str</td>
+        <td>{id:INT} [v:ANY]</td>
+        <td>Returns v projection to STR type into index id or _get variable</td>
+      </tr>
+      <tr>
+        <td>25</td>
+        <td>ceil</td>
+        <td>{id:INT} [v:DOT]</td>
+        <td>Returns round up of v into index id or _get variable as INT type</td>
+      </tr>
+      <tr>
+        <td>26</td>
+        <td>floor</td>
+        <td>{id:INT} [v:DOT]</td>
+        <td>Returns round down of v into index id or _get variable as INT type</td>
+      </tr>
+      <tr>
+        <td>27</td>
+        <td>round</td>
+        <td>{id:INT} [v:DOT]</td>
+        <td>Returns round to nearest of v into index id or _get variable as INT type</td>
+      </tr>
     </table>
     <table>
       <p>List of predefined variables</p>
