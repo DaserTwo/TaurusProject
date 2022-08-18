@@ -232,29 +232,29 @@ namespace process{
         } else if(cmd == key_words[11]){ //iswap
             cmd::cmd_iswap(&arg_stack, arg_stack.size());
         } else if(cmd == key_words[12]){ //add
-            cmd::cmd_add(&arg_stack, arg_stack.size());
+            cmd::std_cmd_call(&arg_stack, arg_stack.size(), &cmd::add_err, &cmd::add_prot, &cmd::add_prot_err, 2);
         } else if(cmd == key_words[13]){ //sub
             cmd::cmd_sub(&arg_stack, arg_stack.size());
         } else if(cmd == key_words[14]){ //mul
-            cmd::cmd_mul(&arg_stack, arg_stack.size());
+            cmd::std_cmd_call(&arg_stack, arg_stack.size(), &cmd::mul_err, &cmd::mul_prot, &cmd::mul_prot_err, 2);
         } else if(cmd == key_words[15]){ //div
-            cmd::cmd_div(&arg_stack, arg_stack.size());
+            cmd::std_cmd_call(&arg_stack, arg_stack.size(), &cmd::div_err, &cmd::div_prot, &cmd::div_prot_err, 2);
         } else if(cmd == key_words[16]){ //mod
-            cmd::cmd_mod(&arg_stack, arg_stack.size());
+            cmd::std_cmd_call(&arg_stack, arg_stack.size(), &cmd::mod_err, &cmd::mod_prot, &cmd::mod_prot_err, 2);
         } else if(cmd == key_words[17]){ //typeof
-            cmd::cmd_typeof(&arg_stack, arg_stack.size());
+            cmd::std_cmd_call(&arg_stack, arg_stack.size(), &cmd::typeof_err, &cmd::typeof_prot, &cmd::typeof_prot_err, 1);
         } else if(cmd == key_words[18]){ //at
-            cmd::cmd_at(&arg_stack, arg_stack.size());
+            cmd::std_cmd_call(&arg_stack, arg_stack.size(), &cmd::at_err, &cmd::at_prot, &cmd::at_prot_err, 2);
         } else if(cmd == key_words[19]){ //rel
-            cmd::cmd_rel(&arg_stack, arg_stack.size());
+            cmd::std_cmd_call(&arg_stack, arg_stack.size(), &cmd::rel_err, &cmd::rel_prot, &cmd::rel_prot_err, 1);
         } else if(cmd == key_words[20]){ //str
-            cmd::cmd_str(&arg_stack, arg_stack.size());
+            cmd::std_cmd_call(&arg_stack, arg_stack.size(), &cmd::str_err, &cmd::str_prot, &cmd::str_prot_err, 1);
         } else if(cmd == key_words[21]){ //ceil
-            cmd::cmd_ceil(&arg_stack, arg_stack.size());
+            cmd::std_cmd_call(&arg_stack, arg_stack.size(), &cmd::ceil_err, &cmd::ceil_prot, &cmd::ceil_prot_err, 1);
         } else if(cmd == key_words[22]){ //floor
-            cmd::cmd_floor(&arg_stack, arg_stack.size());
+            cmd::std_cmd_call(&arg_stack, arg_stack.size(), &cmd::floor_err, &cmd::floor_prot, &cmd::floor_prot_err, 1);
         } else if(cmd == key_words[23]){ //round
-            cmd::cmd_round(&arg_stack, arg_stack.size());
+            cmd::std_cmd_call(&arg_stack, arg_stack.size(), &cmd::round_err, &cmd::round_prot, &cmd::round_prot_err, 1);
         }
         else{
             printf("Unexcepted key word (this may be a deweloper/undoned key)\n");
