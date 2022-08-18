@@ -2,6 +2,8 @@
 
 #include <common/common.hpp>
 
+#include <cmath>
+
 using namespace std;
 using namespace defs;
 
@@ -975,6 +977,443 @@ namespace cmd{
             memory::set_index(id, g);
         } else{
             typeof_err.too_many_arg();
+        }
+    }
+
+    cmd_error::Error at_err("(at {id:INT} [s:STR] [index:INT])");
+    bool at_prot_err = false;
+    memory::var_type at_prot(stack<pair<arg_type, string>>* arg_stack){
+        at_prot_err = false;
+
+        unsigned long long index = 0;
+        string s = "";
+
+        if(arg_stack->top().first == ARG_INT){
+            index = stoll(arg_stack->top().second);
+        } else if(arg_stack->top().first == ARG_VAR){
+            memory::var_type x = memory::get_var(arg_stack->top().second);
+            if(memory::get_var_error){
+                at_prot_err = true;
+                return memory::var_type();
+            }
+
+            if(x.first == VAR_INT){
+                index = stoll(x.second);
+            } else{
+                at_err.exc_int();
+                at_prot_err = true;
+                return memory::var_type();
+            }
+        } else{
+            at_err.exc_int();
+            at_prot_err = true;
+            return memory::var_type();
+        }
+
+        arg_stack->pop();
+
+        if(arg_stack->top().first == ARG_STR){
+            s = common::clear_str_format(arg_stack->top().second);
+        } else if(arg_stack->top().first == ARG_VAR){
+            memory::var_type x = memory::get_var(arg_stack->top().second);
+            if(memory::get_var_error){
+                at_prot_err = true;
+                return memory::var_type();
+            }
+
+            if(x.first == VAR_STR){
+                s = common::clear_str_format(x.second);
+            } else{
+                at_err.exc_int();
+                at_prot_err = true;
+                return memory::var_type();
+            }
+        } else{
+            at_err.exc_int();
+            at_prot_err = true;
+            return memory::var_type();
+        }
+
+        if(index >= s.length()){
+            printf("Index cannot be bigger than s's length\n");
+        } else{
+            return memory::var_type(VAR_STR, string("\'") + s[index] + "\'");
+        }
+
+        at_prot_err = true;
+        return memory::var_type();
+    }
+
+    void cmd_at(stack<pair<arg_type, string>>* arg_stack, size_t argc){
+        if(argc <= 1){
+            at_err.too_few_arg();
+        } else if(argc == 2){
+            memory::var_type g = at_prot(arg_stack);
+            if(at_prot_err) return;
+
+            memory::_get = g;
+        } else if(argc == 3){
+            unsigned long long id;
+            
+            memory::var_type g = at_prot(arg_stack);
+            if(at_prot_err) return;
+
+            arg_stack->pop();
+            if(arg_stack->top().first == ARG_INT){
+                id = stoll(arg_stack->top().second);
+            } else if(arg_stack->top().first == ARG_VAR){
+                memory::var_type v = memory::get_var(arg_stack->top().second);
+                if(memory::get_var_error) return;
+                else if(v.first == VAR_INT){
+                    id = stoll(v.second);
+                } else{
+                    at_err.bad_arg();
+                    return;
+                }
+            } else{
+                at_err.bad_arg();
+                return;
+            }
+            
+            memory::set_index(id, g);
+        } else{
+            at_err.too_many_arg();
+        }
+    }
+
+    cmd_error::Error rel_err("(rel {id:INT} [v:ANY])");
+    bool rel_prot_err = false;
+    memory::var_type rel_prot(stack<pair<arg_type, string>>* arg_stack){
+        rel_prot_err = false;
+
+        memory::var_type v;
+        if(arg_stack->top().first == ARG_VAR){
+            v = memory::get_var(arg_stack->top().second);
+            if(memory::get_var_error){
+                rel_prot_err = true;
+                return memory::var_type();
+            }
+        } else{
+            v = memory::var_type((var_type)arg_stack->top().first, arg_stack->top().second);
+        }
+
+        switch(v.first){
+            case VAR_INT:
+            case VAR_DOT:
+                return v;
+            case VAR_STR:
+                try{
+                    return memory::var_type(VAR_DOT, to_string(stold(common::clear_str_format(v.second))));
+                } catch(const exception& e){
+                    printf("Conversation error\nWhat: %s\n", e.what());
+                    rel_prot_err = true;
+                    return memory::var_type();
+                }
+            case VAR_BOOL:
+            case VAR_TYPE:
+                return memory::var_type(VAR_INT, v.second);
+            default:
+                printf("An error\n");
+        }
+
+        rel_prot_err = true;
+        return memory::var_type();
+    }
+
+    void cmd_rel(stack<pair<arg_type, string>>* arg_stack, size_t argc){
+        if(argc == 0){
+            rel_err.too_few_arg();
+        } else if(argc == 1){
+            memory::var_type g = rel_prot(arg_stack);
+            if(rel_prot_err) return;
+
+            memory::_get = g;
+        } else if(argc == 2){
+            unsigned long long id;
+            
+            memory::var_type g = rel_prot(arg_stack);
+            if(rel_prot_err) return;
+
+            arg_stack->pop();
+            if(arg_stack->top().first == ARG_INT){
+                id = stoll(arg_stack->top().second);
+            } else if(arg_stack->top().first == ARG_VAR){
+                memory::var_type v = memory::get_var(arg_stack->top().second);
+                if(memory::get_var_error) return;
+                else if(v.first == VAR_INT){
+                    id = stoll(v.second);
+                } else{
+                    rel_err.bad_arg();
+                    return;
+                }
+            } else{
+                rel_err.bad_arg();
+                return;
+            }
+            
+            memory::set_index(id, g);
+        } else{
+            rel_err.too_many_arg();
+        }
+    }
+
+    cmd_error::Error str_err("(str {id:INT} [v:ANY])");
+    bool str_prot_err = false;
+    memory::var_type str_prot(stack<pair<arg_type, string>>* arg_stack){
+        str_prot_err = false;
+
+        memory::var_type v;
+        if(arg_stack->top().first == ARG_VAR){
+            v = memory::get_var(arg_stack->top().second);
+            if(memory::get_var_error){
+                str_prot_err = true;
+                return memory::var_type();
+            }
+        } else{
+            v = memory::var_type((var_type)arg_stack->top().first, arg_stack->top().second);
+        }
+
+        switch(v.first){
+            case VAR_INT:
+            case VAR_DOT:
+                return memory::var_type(VAR_STR, string("\'") + v.second + "\'");
+            case VAR_STR:
+                return memory::var_type(VAR_STR, v.second);
+            case VAR_BOOL:
+                return memory::var_type(VAR_STR, string("\'") + ((v.second == "0")?"false":"true") + "\'");
+            case VAR_TYPE:
+                return memory::var_type(VAR_STR, string("\'") + ((v.second == "0")?"INT":((v.second == "1")?"DOT":((v.second == "2")?"STR":((v.second == "3")?"BOOL":((v.second == "4")?"TYPE":"ANY"))))) + "\'");
+            default:
+                printf("An error\n");
+        }
+
+        str_prot_err = true;
+        return memory::var_type();
+    }
+
+    void cmd_str(stack<pair<arg_type, string>>* arg_stack, size_t argc){
+        if(argc == 0){
+            str_err.too_few_arg();
+        } else if(argc == 1){
+            memory::var_type g = str_prot(arg_stack);
+            if(str_prot_err) return;
+
+            memory::_get = g;
+        } else if(argc == 2){
+            unsigned long long id;
+            
+            memory::var_type g = str_prot(arg_stack);
+            if(str_prot_err) return;
+
+            arg_stack->pop();
+            if(arg_stack->top().first == ARG_INT){
+                id = stoll(arg_stack->top().second);
+            } else if(arg_stack->top().first == ARG_VAR){
+                memory::var_type v = memory::get_var(arg_stack->top().second);
+                if(memory::get_var_error) return;
+                else if(v.first == VAR_INT){
+                    id = stoll(v.second);
+                } else{
+                    str_err.bad_arg();
+                    return;
+                }
+            } else{
+                str_err.bad_arg();
+                return;
+            }
+            
+            memory::set_index(id, g);
+        } else{
+            str_err.too_many_arg();
+        }
+    }
+
+    cmd_error::Error ceil_err("(ceil {id:INT} [v:DOT])");
+    bool ceil_prot_err = false;
+    memory::var_type ceil_prot(stack<pair<arg_type, string>>* arg_stack){
+        ceil_prot_err = false;
+
+        memory::var_type v;
+        if(arg_stack->top().first == ARG_VAR){
+            v = memory::get_var(arg_stack->top().second);
+            if(memory::get_var_error){
+                ceil_prot_err = true;
+                return memory::var_type();
+            }
+        } else{
+            v = memory::var_type((var_type)arg_stack->top().first, arg_stack->top().second);
+        }
+
+        if(v.first == VAR_DOT){
+            return memory::var_type(VAR_INT, to_string(ceil(stold(v.second))));
+        } else{
+            ceil_err.exc_dot();
+        }
+
+        ceil_prot_err = true;
+        return memory::var_type();
+    }
+
+    void cmd_ceil(stack<pair<arg_type, string>>* arg_stack, size_t argc){
+        if(argc == 0){
+            ceil_err.too_few_arg();
+        } else if(argc == 1){
+            memory::var_type g = ceil_prot(arg_stack);
+            if(ceil_prot_err) return;
+
+            memory::_get = g;
+        } else if(argc == 2){
+            unsigned long long id;
+            
+            memory::var_type g = ceil_prot(arg_stack);
+            if(ceil_prot_err) return;
+
+            arg_stack->pop();
+            if(arg_stack->top().first == ARG_INT){
+                id = stoll(arg_stack->top().second);
+            } else if(arg_stack->top().first == ARG_VAR){
+                memory::var_type v = memory::get_var(arg_stack->top().second);
+                if(memory::get_var_error) return;
+                else if(v.first == VAR_INT){
+                    id = stoll(v.second);
+                } else{
+                    ceil_err.bad_arg();
+                    return;
+                }
+            } else{
+                ceil_err.bad_arg();
+                return;
+            }
+            
+            memory::set_index(id, g);
+        } else{
+            ceil_err.too_many_arg();
+        }
+    }
+
+    cmd_error::Error floor_err("(floor {id:INT} [v:DOT])");
+    bool floor_prot_err = false;
+    memory::var_type floor_prot(stack<pair<arg_type, string>>* arg_stack){
+        floor_prot_err = false;
+
+        memory::var_type v;
+        if(arg_stack->top().first == ARG_VAR){
+            v = memory::get_var(arg_stack->top().second);
+            if(memory::get_var_error){
+                floor_prot_err = true;
+                return memory::var_type();
+            }
+        } else{
+            v = memory::var_type((var_type)arg_stack->top().first, arg_stack->top().second);
+        }
+
+        if(v.first == VAR_DOT){
+            return memory::var_type(VAR_INT, to_string(floor(stold(v.second))));
+        } else{
+            floor_err.exc_dot();
+        }
+
+        floor_prot_err = true;
+        return memory::var_type();
+    }
+
+    void cmd_floor(stack<pair<arg_type, string>>* arg_stack, size_t argc){
+        if(argc == 0){
+            floor_err.too_few_arg();
+        } else if(argc == 1){
+            memory::var_type g = floor_prot(arg_stack);
+            if(floor_prot_err) return;
+
+            memory::_get = g;
+        } else if(argc == 2){
+            unsigned long long id;
+            
+            memory::var_type g = floor_prot(arg_stack);
+            if(floor_prot_err) return;
+
+            arg_stack->pop();
+            if(arg_stack->top().first == ARG_INT){
+                id = stoll(arg_stack->top().second);
+            } else if(arg_stack->top().first == ARG_VAR){
+                memory::var_type v = memory::get_var(arg_stack->top().second);
+                if(memory::get_var_error) return;
+                else if(v.first == VAR_INT){
+                    id = stoll(v.second);
+                } else{
+                    floor_err.bad_arg();
+                    return;
+                }
+            } else{
+                floor_err.bad_arg();
+                return;
+            }
+            
+            memory::set_index(id, g);
+        } else{
+            floor_err.too_many_arg();
+        }
+    }
+
+    cmd_error::Error round_err("(round {id:INT} [v:DOT])");
+    bool round_prot_err = false;
+    memory::var_type round_prot(stack<pair<arg_type, string>>* arg_stack){
+        round_prot_err = false;
+
+        memory::var_type v;
+        if(arg_stack->top().first == ARG_VAR){
+            v = memory::get_var(arg_stack->top().second);
+            if(memory::get_var_error){
+                round_prot_err = true;
+                return memory::var_type();
+            }
+        } else{
+            v = memory::var_type((var_type)arg_stack->top().first, arg_stack->top().second);
+        }
+
+        if(v.first == VAR_DOT){
+            return memory::var_type(VAR_INT, to_string(llround(stold(v.second))));
+        } else{
+            round_err.exc_dot();
+        }
+
+        round_prot_err = true;
+        return memory::var_type();
+    }
+
+    void cmd_round(stack<pair<arg_type, string>>* arg_stack, size_t argc){
+        if(argc == 0){
+            round_err.too_few_arg();
+        } else if(argc == 1){
+            memory::var_type g = round_prot(arg_stack);
+            if(round_prot_err) return;
+
+            memory::_get = g;
+        } else if(argc == 2){
+            unsigned long long id;
+            
+            memory::var_type g = round_prot(arg_stack);
+            if(round_prot_err) return;
+
+            arg_stack->pop();
+            if(arg_stack->top().first == ARG_INT){
+                id = stoll(arg_stack->top().second);
+            } else if(arg_stack->top().first == ARG_VAR){
+                memory::var_type v = memory::get_var(arg_stack->top().second);
+                if(memory::get_var_error) return;
+                else if(v.first == VAR_INT){
+                    id = stoll(v.second);
+                } else{
+                    round_err.bad_arg();
+                    return;
+                }
+            } else{
+                round_err.bad_arg();
+                return;
+            }
+            
+            memory::set_index(id, g);
+        } else{
+            round_err.too_many_arg();
         }
     }
 }

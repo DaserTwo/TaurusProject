@@ -13,7 +13,7 @@ using namespace defs;
 
 namespace process{
     stack<pair<arg_type, string>> arg_stack;
-    string key_words[] = {"exit", "putn", "puts", "push", "pop", "stack", "size", "ipush", "ipop", "index", "isize", "iswap", "add", "sub", "mul", "div", "mod", "typeof"};
+    string key_words[] = {"exit", "putn", "puts", "push", "pop", "stack", "size", "ipush", "ipop", "index", "isize", "iswap", "add", "sub", "mul", "div", "mod", "typeof", "at", "rel", "str", "ceil", "floor", "round"};
 
     void processInput(string input){
         if(input.empty())
@@ -243,6 +243,18 @@ namespace process{
             cmd::cmd_mod(&arg_stack, arg_stack.size());
         } else if(cmd == key_words[17]){ //typeof
             cmd::cmd_typeof(&arg_stack, arg_stack.size());
+        } else if(cmd == key_words[18]){ //at
+            cmd::cmd_at(&arg_stack, arg_stack.size());
+        } else if(cmd == key_words[19]){ //rel
+            cmd::cmd_rel(&arg_stack, arg_stack.size());
+        } else if(cmd == key_words[20]){ //str
+            cmd::cmd_str(&arg_stack, arg_stack.size());
+        } else if(cmd == key_words[21]){ //ceil
+            cmd::cmd_ceil(&arg_stack, arg_stack.size());
+        } else if(cmd == key_words[22]){ //floor
+            cmd::cmd_floor(&arg_stack, arg_stack.size());
+        } else if(cmd == key_words[23]){ //round
+            cmd::cmd_round(&arg_stack, arg_stack.size());
         }
         else{
             printf("Unexcepted key word (this may be a deweloper/undoned key)\n");

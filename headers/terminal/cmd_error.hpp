@@ -26,6 +26,10 @@ namespace cmd_error{
                 printf("Excepted integere %s\n", synax.c_str());
             }
 
+            inline void exc_dot(){
+                printf("Excepted dot (floatingpoint number) %s\n", synax.c_str());
+            }
+
             inline void exc_rel(){
                 printf("Excepted real number %s\n", synax.c_str());
             }

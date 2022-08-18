@@ -73,4 +73,34 @@ namespace cmd{
     extern bool typeof_prot_err;
     memory::var_type typeof_prot(std::stack<std::pair<defs::arg_type, std::string>>* arg_stack);
     void cmd_typeof(std::stack<std::pair<defs::arg_type, std::string>>* arg_stack, std::size_t argc);
+
+    extern cmd_error::Error at_err;
+    extern bool at_prot_err;
+    memory::var_type at_prot(std::stack<std::pair<defs::arg_type, std::string>>* arg_stack);
+    void cmd_at(std::stack<std::pair<defs::arg_type, std::string>>* arg_stack, std::size_t argc);
+
+    extern cmd_error::Error rel_err;
+    extern bool rel_prot_err;
+    memory::var_type rel_prot(std::stack<std::pair<defs::arg_type, std::string>>* arg_stack);
+    void cmd_rel(std::stack<std::pair<defs::arg_type, std::string>>* arg_stack, std::size_t argc);
+
+    extern cmd_error::Error str_err;
+    extern bool str_prot_err;
+    memory::var_type str_prot(std::stack<std::pair<defs::arg_type, std::string>>* arg_stack);
+    void cmd_str(std::stack<std::pair<defs::arg_type, std::string>>* arg_stack, std::size_t argc);
+
+    extern cmd_error::Error ceil_err;
+    extern bool ceil_prot_err;
+    memory::var_type ceil_prot(std::stack<std::pair<defs::arg_type, std::string>>* arg_stack);
+    void cmd_ceil(std::stack<std::pair<defs::arg_type, std::string>>* arg_stack, std::size_t argc);
+
+    extern cmd_error::Error floor_err;
+    extern bool floor_prot_err;
+    memory::var_type floor_prot(std::stack<std::pair<defs::arg_type, std::string>>* arg_stack);
+    void cmd_floor(std::stack<std::pair<defs::arg_type, std::string>>* arg_stack, std::size_t argc);
+
+    extern cmd_error::Error round_err;
+    extern bool round_prot_err;
+    memory::var_type round_prot(std::stack<std::pair<defs::arg_type, std::string>>* arg_stack);
+    void cmd_round(std::stack<std::pair<defs::arg_type, std::string>>* arg_stack, std::size_t argc);
 }
