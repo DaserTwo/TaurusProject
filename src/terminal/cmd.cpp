@@ -86,7 +86,7 @@ namespace cmd{
                 buffer = memory::var_type((var_type)arg_stack->top().first, arg_stack->top().second);
             }
 
-            if(buffer.first == VAR_INT || buffer.first == VAR_BOOL || buffer.first == VAR_TYPE){
+            if(buffer.first == VAR_INT || buffer.first == VAR_BOOL || buffer.first == VAR_TYPE || buffer.first == VAR_RELATION){
                 long long n = stoll(buffer.second);
                 printf("%lli", n);
             } else if(buffer.first == VAR_DOT){
@@ -115,7 +115,9 @@ namespace cmd{
                 } else if(buffer.first == VAR_BOOL){
                     printf("%s", (buffer.second == "0")?"false":"true");
                 } else if(buffer.first == VAR_TYPE){
-                    printf("%s", (buffer.second == "0")?"INT":((buffer.second == "1")?"DOT":((buffer.second == "2")?"STR":((buffer.second == "3")?"BOOL":((buffer.second == "4")?"TYPE":"ANY")))));
+                    printf("%s", (buffer.second == "0")?"INT":((buffer.second == "1")?"DOT":((buffer.second == "2")?"STR":((buffer.second == "3")?"BOOL":((buffer.second == "4")?"TYPE":((buffer.second == "5")?"RELATION":"ANY"))))));
+                } else if(buffer.first == VAR_RELATION){
+                    printf("%s", (buffer.second == "0")?"equal":((buffer.second == "1")?"bigger":((buffer.second == "2")?"smaller":"not equal")));
                 } else if(buffer.first != VAR_STR){
                     puts_err.exc_str();
                     return;
@@ -429,6 +431,8 @@ namespace cmd{
                 bv = v2.second.substr(1, v2.second.length() - 2);
             else if(v2.first == VAR_TYPE)
                 bv = (v2.second == "0")?"INT":((v2.second == "1")?"DOT":((v2.second == "2")?"STR":((v2.second == "3")?"BOOL":((v2.second == "4")?"TYPE":"ANY"))));
+            else if(v2.first == VAR_RELATION)
+                bv = (v2.second == "0")?"equal":((v2.second == "1")?"bigger":((v2.second == "2")?"smaller":"not equal"));
             return memory::var_type(VAR_STR, av + bv + "'");
         } else if(v1.first == VAR_INT){
             if(v2.first == VAR_INT){
@@ -824,6 +828,8 @@ namespace cmd{
                 return memory::var_type(VAR_TYPE, "3");
             case VAR_TYPE:
                 return memory::var_type(VAR_TYPE, "4");
+            case VAR_RELATION:
+                return memory::var_type(VAR_TYPE, "5");
             default:
                 printf("An error\n");
                 break;
@@ -927,6 +933,7 @@ namespace cmd{
                 }
             case VAR_BOOL:
             case VAR_TYPE:
+            case VAR_RELATION:
                 return memory::var_type(VAR_INT, v.second);
             default:
                 printf("An error\n");
@@ -961,7 +968,9 @@ namespace cmd{
             case VAR_BOOL:
                 return memory::var_type(VAR_STR, string("\'") + ((v.second == "0")?"false":"true") + "\'");
             case VAR_TYPE:
-                return memory::var_type(VAR_STR, string("\'") + ((v.second == "0")?"INT":((v.second == "1")?"DOT":((v.second == "2")?"STR":((v.second == "3")?"BOOL":((v.second == "4")?"TYPE":"ANY"))))) + "\'");
+                return memory::var_type(VAR_STR, string("\'") + ((v.second == "0")?"INT":((v.second == "1")?"DOT":((v.second == "2")?"STR":((v.second == "3")?"BOOL":((v.second == "4")?"TYPE":((v.second == "5")?"RELATION":"ANY")))))) + "\'");
+            case VAR_RELATION:
+                return memory::var_type(VAR_STR, string("\'") + ((v.second == "0")?"equal":((v.second == "1")?"bigger":((v.second == "2")?"smaller":"not equal"))) + "\'");
             default:
                 printf("An error\n");
         }
@@ -1046,5 +1055,263 @@ namespace cmd{
 
         round_prot_err = true;
         return memory::var_type();
+    }
+
+    cmd_error::Error process_err("(process [cmd:STR])");
+    string process_output = "";
+    void cmd_process(stack<pair<arg_type, string>>* arg_stack, size_t argc){
+        process_output = "";
+
+        if(argc == 0){
+            process_err.too_few_arg();
+        } else if(argc == 1){
+            if(arg_stack->top().first == ARG_STR){
+                process_output = arg_stack->top().second;
+            } else if(arg_stack->top().first == ARG_VAR){
+                process_output = memory::get_var(arg_stack->top().second).second;
+                if(memory::get_var_error) return;
+            } else{
+                process_err.exc_str();
+                return;
+            }
+            process_output = common::clear_str_format(process_output);
+        } else{
+            process_err.too_many_arg();
+        }
+    }
+
+    cmd_error::Error is_err("(is {id:INT} [v1:ANY] [q:RELATION] [v2:ANY])");
+    bool is_prot_err = false;
+    memory::var_type is_prot(stack<pair<arg_type, string>>* arg_stack){
+        is_prot_err = false;
+
+        memory::var_type v1;
+        memory::var_type v2;
+        memory::var_type q;
+
+        if(arg_stack->top().first == ARG_VAR){
+            v2 = memory::get_var(arg_stack->top().second);
+            if(memory::get_var_error){
+                is_prot_err = true;
+                return memory::var_type();
+            }
+        } else{
+            v2 = memory::var_type((var_type)arg_stack->top().first, arg_stack->top().second);
+        }
+
+        arg_stack->pop();
+        if(arg_stack->top().first == ARG_VAR){
+            q = memory::get_var(arg_stack->top().second);
+            if(memory::get_var_error){
+                is_prot_err = true;
+                return memory::var_type();
+            } else if(q.first != VAR_RELATION){
+                is_err.exc_relation();
+                is_prot_err = true;
+                return memory::var_type();
+            }
+        } else{
+            is_err.exc_relation();
+            is_prot_err = true;
+            return memory::var_type();
+        }
+
+        arg_stack->pop();
+        if(arg_stack->top().first == ARG_VAR){
+            v1 = memory::get_var(arg_stack->top().second);
+            if(memory::get_var_error){
+                is_prot_err = true;
+                return memory::var_type();
+            }
+        } else{
+            v1 = memory::var_type((var_type)arg_stack->top().first, arg_stack->top().second);
+        }
+
+        if(q.second == "0"){
+            if(v1.first == v2.first){
+                return memory::var_type(VAR_BOOL, (v1.second == v2.second)?"1":"0");
+            } else{
+                return memory::var_type(VAR_BOOL, "0");
+            }
+        } else if(q.second == "1"){
+            if((v1.first == VAR_INT || v1.first == VAR_DOT) && (v2.first == VAR_INT || v2.first == VAR_DOT)){
+                if(v1.first == VAR_INT && v2.first == VAR_INT){
+                    return memory::var_type(VAR_BOOL, (stoll(v1.second) > stoll(v2.second))?"1":"0");
+                } else{
+                    return memory::var_type(VAR_BOOL, (stold(v1.second) > stold(v2.second))?"1":"0");
+                }
+            } else{
+                return memory::var_type(VAR_BOOL, "0");
+            }
+        } else if(q.second == "2"){
+            if((v1.first == VAR_INT || v1.first == VAR_DOT) && (v2.first == VAR_INT || v2.first == VAR_DOT)){
+                if(v1.first == VAR_INT && v2.first == VAR_INT){
+                    return memory::var_type(VAR_BOOL, (stoll(v1.second) < stoll(v2.second))?"1":"0");
+                } else{
+                    return memory::var_type(VAR_BOOL, (stold(v1.second) < stold(v2.second))?"1":"0");
+                }
+            } else{
+                return memory::var_type(VAR_BOOL, "0");
+            }
+        } else{
+            is_err.bad_arg();
+        }
+
+        is_prot_err = true;
+        return memory::var_type();
+    }
+
+    cmd_error::Error cmp_err("(cmp {id:INT} [v1:ANY] [v2:ANY])");
+    bool cmp_prot_err = false;
+    memory::var_type cmp_prot(stack<pair<arg_type, string>>* arg_stack){
+        cmp_prot_err = false;
+
+        memory::var_type v1;
+        memory::var_type v2;
+
+        if(arg_stack->top().first == ARG_VAR){
+            v2 = memory::get_var(arg_stack->top().second);
+            if(memory::get_var_error){
+                cmp_prot_err = true;
+                return memory::var_type();
+            }
+        } else{
+            v2 = memory::var_type((var_type)arg_stack->top().first, arg_stack->top().second);
+        }
+
+        arg_stack->pop();
+        if(arg_stack->top().first == ARG_VAR){
+            v1 = memory::get_var(arg_stack->top().second);
+            if(memory::get_var_error){
+                cmp_prot_err = true;
+                return memory::var_type();
+            }
+        } else{
+            v1 = memory::var_type((var_type)arg_stack->top().first, arg_stack->top().second);
+        }
+
+        if((v1.first == VAR_INT || v1.first == VAR_DOT) && (v2.first == VAR_INT || v2.first == VAR_DOT)){
+            return memory::var_type(VAR_RELATION, ((stold(v1.second) == stold(v2.second))?"0":((stold(v1.second) > stold(v2.second))?"1":"2")));
+        } else if(v1.first == v2.first){
+            if(v1.second == v2.second){
+                return memory::var_type(VAR_RELATION, "0");
+            } else{
+                return memory::var_type(VAR_RELATION, "3");
+            }
+        } else{
+            return memory::var_type(VAR_RELATION, "3");
+        }
+
+        cmp_prot_err = true;
+        return memory::var_type();
+    }
+
+    cmd_error::Error if_err("(if [x:BOOL] [then:STR] {else:STR})");
+    string if_output = "";
+    void cmd_if(stack<pair<arg_type, string>>* arg_stack, size_t argc){
+        if_output = "";
+
+        if(argc <= 1){
+            if_err.too_few_arg();
+        } else if(argc == 2){
+            bool x;
+            string then = "";
+
+            if(arg_stack->top().first == ARG_STR){
+                then = arg_stack->top().second;
+            } else if(arg_stack->top().first == ARG_VAR){
+                memory::var_type g = memory::get_var(arg_stack->top().second);
+                if(memory::get_var_error) return;
+                else if(g.first != VAR_STR){
+                    if_err.exc_str();
+                    return;
+                }
+
+                then = g.second;
+            } else{
+                if_err.exc_str();
+                return;
+            }
+            
+            then = common::clear_str_format(then);
+
+            arg_stack->pop();
+            if(arg_stack->top().first == ARG_VAR){
+                memory::var_type g = memory::get_var(arg_stack->top().second);
+                if(memory::get_var_error) return;
+                else if(g.first != VAR_BOOL){
+                    if_err.exc_bool();
+                    return;
+                }
+
+                x = !(g.second == "0");
+            } else{
+                if_err.exc_bool();
+                return;
+            }
+
+            if(x) if_output = then;
+        } else if(argc == 3){
+            bool x;
+            string then = "";
+            string el = "";
+
+            if(arg_stack->top().first == ARG_STR){
+                el = arg_stack->top().second;
+            } else if(arg_stack->top().first == ARG_VAR){
+                memory::var_type g = memory::get_var(arg_stack->top().second);
+                if(memory::get_var_error) return;
+                else if(g.first != VAR_STR){
+                    if_err.exc_str();
+                    return;
+                }
+
+                el = g.second;
+            } else{
+                if_err.exc_str();
+                return;
+            }
+            
+            el = common::clear_str_format(el);
+
+            arg_stack->pop();
+            if(arg_stack->top().first == ARG_STR){
+                then = arg_stack->top().second;
+            } else if(arg_stack->top().first == ARG_VAR){
+                memory::var_type g = memory::get_var(arg_stack->top().second);
+                if(memory::get_var_error) return;
+                else if(g.first != VAR_STR){
+                    if_err.exc_str();
+                    return;
+                }
+
+                then = g.second;
+            } else{
+                if_err.exc_str();
+                return;
+            }
+            
+            then = common::clear_str_format(then);
+
+            arg_stack->pop();
+            if(arg_stack->top().first == ARG_VAR){
+                memory::var_type g = memory::get_var(arg_stack->top().second);
+                if(memory::get_var_error) return;
+                else if(g.first != VAR_BOOL){
+                    if_err.exc_bool();
+                    return;
+                }
+
+                x = !(g.second == "0");
+            } else{
+                if_err.exc_bool();
+                return;
+            }
+
+            if(x) if_output = then;
+            else if_output = el;
+        } else{
+            if_err.too_many_arg();
+        }
     }
 }

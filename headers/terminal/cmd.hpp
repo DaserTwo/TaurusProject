@@ -94,4 +94,20 @@ namespace cmd{
     extern cmd_error::Error round_err;
     extern bool round_prot_err;
     memory::var_type round_prot(std::stack<std::pair<defs::arg_type, std::string>>* arg_stack); //std prot
+
+    extern cmd_error::Error process_err;
+    extern std::string process_output;
+    void cmd_process(std::stack<std::pair<defs::arg_type, std::string>>* arg_stack, std::size_t argc);
+
+    extern cmd_error::Error is_err;
+    extern bool is_prot_err;
+    memory::var_type is_prot(std::stack<std::pair<defs::arg_type, std::string>>* arg_stack); //std prot
+
+    extern cmd_error::Error cmp_err;
+    extern bool cmp_prot_err;
+    memory::var_type cmp_prot(std::stack<std::pair<defs::arg_type, std::string>>* arg_stack); //std prot
+
+    extern cmd_error::Error if_err;
+    extern std::string if_output;
+    void cmd_if(std::stack<std::pair<defs::arg_type, std::string>>* arg_stack, std::size_t argc);
 }

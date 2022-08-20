@@ -36,6 +36,16 @@ namespace memory{
             return var_type(defs::VAR_TYPE, "3");
         } else if(name == "_type"){
             return var_type(defs::VAR_TYPE, "4");
+        } else if(name == "_relation"){
+            return var_type(defs::VAR_TYPE, "5");
+        } else if(name == "_equal" || name == "="){
+            return var_type(defs::VAR_RELATION, "0");
+        } else if(name == "_bigger" || name == ">"){
+            return var_type(defs::VAR_RELATION, "1");
+        } else if(name == "_smaller" || name == "<"){
+            return var_type(defs::VAR_RELATION, "2");
+        } else if(name == "_notequal" || name == "!" || name == "!="){
+            return var_type(defs::VAR_RELATION, "3");
         } else if(name[0] == '$'){
             string index = name.substr(1);
             if(index.empty()){

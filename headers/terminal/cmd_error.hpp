@@ -42,6 +42,14 @@ namespace cmd_error{
                 printf("Excepted boolean %s\n", synax.c_str());
             }
 
+            inline void exc_type(){
+                printf("Excepted type %s\n", synax.c_str());
+            }
+
+            inline void exc_relation(){
+                printf("Excepted relation %s\n", synax.c_str());
+            }
+
             inline void exc_arg(){
                 printf("Excepted argument %s\n", synax.c_str());
             }

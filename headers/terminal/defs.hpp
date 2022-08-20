@@ -13,6 +13,7 @@ namespace defs{
         VAR_DOT = ARG_DOT,
         VAR_STR = ARG_STR,
         VAR_BOOL,
-        VAR_TYPE
+        VAR_TYPE,
+        VAR_RELATION
     } var_type;
 }
