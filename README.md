@@ -204,6 +204,42 @@ Elements:
         <td>[x:BOOL] [then:STR] {else:STR}</td>
         <td>if <i>x</i> is true then processing <i>then</i> else processing nothing or <i>else</i></td>
       </tr>
+      <tr>
+        <td>32</td>
+        <td>getc</td>
+        <td>{id:INT}</td>
+        <td>Gets character from input and puts it into index <i>id</i> or _get variable as INT type</td>
+      </tr>
+      <tr>
+        <td>33</td>
+        <td>geti</td>
+        <td>{id:INT}</td>
+        <td>Gets integere from input and puts it into index <i>id</i> or _get variable as INT type</td>
+      </tr>
+      <tr>
+        <td>34</td>
+        <td>gets</td>
+        <td>{id:INT} [lenght:INT]</td>
+        <td>Gets string from input (limited by length) and puts it into index <i>id</i> or _get variable as INT type</td>
+      </tr>
+      <tr>
+        <td>35</td>
+        <td>getd</td>
+        <td>{id:INT}</td>
+        <td>Gets floating point number from input and puts it into index <i>id</i> or _get variable as INT type</td>
+      </tr>
+      <tr>
+        <td>36</td>
+        <td>getl</td>
+        <td>{id:INT}</td>
+        <td>Gets line from input and puts it into index <i>id</i> or _get variable as INT type</td>
+      </tr>
+      <tr>
+        <td>37</td>
+        <td>getw</td>
+        <td>{id:INT}</td>
+        <td>Gets one word (seperated by white character) from input and puts it into index <i>id</i> or _get variable as INT type</td>
+      </tr>
     </table>
     <table>
       <p>List of predefined variables</p>
