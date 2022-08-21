@@ -2,12 +2,14 @@
 
 #include <common/common.hpp>
 
+#include <iostream>
 #include <cmath>
 
 using namespace std;
 using namespace defs;
 
 namespace cmd{
+    bool _prot_err = false;
     void std_cmd_call(stack<pair<arg_type, string>>* arg_stack, size_t argc, cmd_error::Error* err, memory::var_type(*cmd_prot)(stack<pair<arg_type, string>>* arg_stack), bool* cmd_prot_err, int arg_prot_c){
         if(argc < arg_prot_c){
             err->too_few_arg();
@@ -788,7 +790,7 @@ namespace cmd{
 
         if(v1.first == VAR_INT){
             if(v2.first == VAR_INT){
-                memory::_get = memory::var_type(VAR_INT, to_string(stoll(v1.second) % stoll(v2.second)));
+                return memory::var_type(VAR_INT, to_string(stoll(v1.second) % stoll(v2.second)));
             } else{
                 mod_err.bad_arg();
             }
@@ -1313,5 +1315,91 @@ namespace cmd{
         } else{
             if_err.too_many_arg();
         }
+    }
+
+    cmd_error::Error getc_err("(getc {id:INT})");
+    memory::var_type getc_prot(std::stack<std::pair<defs::arg_type, std::string>>* arg_stack){
+        _prot_err = false;
+
+        char c = getc(stdin);
+        return memory::var_type(VAR_STR, string("\'") + c + "\'");
+    }
+
+    cmd_error::Error geti_err("(geti {id:INT})");
+    memory::var_type geti_prot(std::stack<std::pair<defs::arg_type, std::string>>* arg_stack){
+        _prot_err = false;
+
+        long long c = 0;
+        scanf("%lli", &c);
+        return memory::var_type(VAR_INT, to_string(c));
+    }
+
+    cmd_error::Error gets_err("(gets {id:INT} [length:INT])");
+    memory::var_type gets_prot(std::stack<std::pair<defs::arg_type, std::string>>* arg_stack){
+        _prot_err = false;
+
+        long long length = 0;
+
+        if(arg_stack->top().first == ARG_INT){
+            length = stoll(arg_stack->top().second);
+        } else if(arg_stack->top().first == ARG_VAR){
+            memory::var_type g = memory::get_var(arg_stack->top().second);
+            if(g.first == VAR_INT){
+                length = stoll(g.second);
+            } else{
+                gets_err.exc_int();
+                _prot_err = true;
+                return memory::var_type();
+            }
+        } else{
+            gets_err.exc_int();
+            _prot_err = true;
+            return memory::var_type();
+        }
+
+        if(length <= 0){
+            printf("Length must be bigger than 0\n");
+        } else{
+            char* inp = new char[length];
+
+            scanf((string("%") + to_string(length) + "s").c_str(), inp);
+            string input = string(inp);
+
+            delete[] inp;
+            
+            return memory::var_type(VAR_STR, string("\'") + input + "\'");
+        }
+
+        _prot_err = true;
+        return memory::var_type();
+    }
+
+    cmd_error::Error getd_err("(getd {id:INT})");
+    memory::var_type getd_prot(std::stack<std::pair<defs::arg_type, std::string>>* arg_stack){
+        _prot_err = false;
+
+        long double c = 0;
+        scanf("%Le", &c);
+        return memory::var_type(VAR_DOT, to_string(c));
+    }
+
+    cmd_error::Error getl_err("(getl {id:INT})");
+    memory::var_type getl_prot(std::stack<std::pair<defs::arg_type, std::string>>* arg_stack){
+        _prot_err = false;
+
+        string inp = "";
+        getline(cin, inp);
+        return memory::var_type(VAR_STR, string("\'") + inp + "\'");
+    }
+
+    cmd_error::Error getw_err("(getw {id:INT})");
+    memory::var_type getw_prot(std::stack<std::pair<defs::arg_type, std::string>>* arg_stack){
+        _prot_err = false;
+
+        string inp = "";
+        cin.clear();
+        cin.ignore();
+        cin >> inp;
+        return memory::var_type(VAR_STR, string("\'") + inp + "\'");
     }
 }

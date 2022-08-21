@@ -13,7 +13,7 @@ using namespace defs;
 
 namespace process{
     stack<pair<arg_type, string>> arg_stack;
-    string key_words[] = {"exit", "putn", "puts", "push", "pop", "stack", "size", "ipush", "ipop", "index", "isize", "iswap", "add", "sub", "mul", "div", "mod", "typeof", "at", "rel", "str", "ceil", "floor", "round", "process", "is", "cmp", "if"};
+    string key_words[] = {"exit", "putn", "puts", "push", "pop", "stack", "size", "ipush", "ipop", "index", "isize", "iswap", "add", "sub", "mul", "div", "mod", "typeof", "at", "rel", "str", "ceil", "floor", "round", "process", "is", "cmp", "if", "getc", "geti", "gets", "getd", "getl", "getw"};
 
     void processInput(string input){
         if(input.empty())
@@ -267,6 +267,18 @@ namespace process{
             cmd::cmd_if(&arg_stack, arg_stack.size());
             clearArgStack();
             processInput(cmd::if_output);
+        } else if(cmd == key_words[28]){ //getc
+            cmd::std_cmd_call(&arg_stack, arg_stack.size(), &cmd::getc_err, &cmd::getc_prot, &cmd::_prot_err, 0);
+        } else if(cmd == key_words[29]){ //geti
+            cmd::std_cmd_call(&arg_stack, arg_stack.size(), &cmd::geti_err, &cmd::geti_prot, &cmd::_prot_err, 0);
+        } else if(cmd == key_words[30]){ //gets
+            cmd::std_cmd_call(&arg_stack, arg_stack.size(), &cmd::gets_err, &cmd::gets_prot, &cmd::_prot_err, 1);
+        } else if(cmd == key_words[31]){ //getd
+            cmd::std_cmd_call(&arg_stack, arg_stack.size(), &cmd::getd_err, &cmd::getd_prot, &cmd::_prot_err, 0);
+        } else if(cmd == key_words[32]){ //getl
+            cmd::std_cmd_call(&arg_stack, arg_stack.size(), &cmd::getl_err, &cmd::getl_prot, &cmd::_prot_err, 0);
+        } else if(cmd == key_words[33]){ //getw
+            cmd::std_cmd_call(&arg_stack, arg_stack.size(), &cmd::getw_err, &cmd::getw_prot, &cmd::_prot_err, 0);
         } 
         else{
             printf("Unexcepted key word (this may be a deweloper/undoned key)\n");

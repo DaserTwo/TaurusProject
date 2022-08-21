@@ -8,6 +8,7 @@
 #include "defs.hpp"
 
 namespace cmd{
+    extern bool _prot_err;
     void std_cmd_call(std::stack<std::pair<defs::arg_type, std::string>>* arg_stack, std::size_t argc, cmd_error::Error* err, memory::var_type(*cmd_prot)(std::stack<std::pair<defs::arg_type, std::string>>* arg_stack), bool* cmd_prot_err, int arg_prot_c);
 
     extern cmd_error::Error exit_err;
@@ -110,4 +111,22 @@ namespace cmd{
     extern cmd_error::Error if_err;
     extern std::string if_output;
     void cmd_if(std::stack<std::pair<defs::arg_type, std::string>>* arg_stack, std::size_t argc);
+
+    extern cmd_error::Error getc_err;
+    memory::var_type getc_prot(std::stack<std::pair<defs::arg_type, std::string>>* arg_stack); //std prot
+
+    extern cmd_error::Error geti_err;
+    memory::var_type geti_prot(std::stack<std::pair<defs::arg_type, std::string>>* arg_stack); //std prot
+
+    extern cmd_error::Error gets_err;
+    memory::var_type gets_prot(std::stack<std::pair<defs::arg_type, std::string>>* arg_stack); //std prot
+
+    extern cmd_error::Error getd_err;
+    memory::var_type getd_prot(std::stack<std::pair<defs::arg_type, std::string>>* arg_stack); //std prot
+
+    extern cmd_error::Error getl_err;
+    memory::var_type getl_prot(std::stack<std::pair<defs::arg_type, std::string>>* arg_stack); //std prot
+
+    extern cmd_error::Error getw_err;
+    memory::var_type getw_prot(std::stack<std::pair<defs::arg_type, std::string>>* arg_stack); //std prot
 }
