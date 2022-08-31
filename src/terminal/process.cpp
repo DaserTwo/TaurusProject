@@ -13,7 +13,7 @@ using namespace defs;
 
 namespace process{
     stack<pair<arg_type, string>> arg_stack;
-    string key_words[] = {"exit", "putn", "puts", "push", "pop", "stack", "size", "ipush", "ipop", "index", "isize", "iswap", "add", "sub", "mul", "div", "mod", "typeof", "at", "rel", "str", "ceil", "floor", "round", "process", "is", "cmp", "if", "getc", "geti", "gets", "getd", "getl", "getw"};
+    string key_words[] = {"exit", "push", "pop", "stack", "size", "ipush", "ipop", "index", "isize", "iswap", "add", "sub", "mul", "div", "mod", "typeof", "at", "rel", "str", "ceil", "floor", "round", "process", "is", "cmp", "if", "put", "putl", "get", "getl", "fput", "fputl", "fwrite", "fwritel", "fread"};
 
     void processInput(string input){
         if(input.empty())
@@ -63,7 +63,7 @@ namespace process{
                         args += '\\';
                     }
                     args += c;
-                } else if(c == ';'){
+                } else if(c == ';' || c == '\n'){
                     get_next = true;
                 } else if(c == '\''){
                     arg_str = true;
@@ -78,11 +78,11 @@ namespace process{
                 }
                 last = c;
             } else{
-                if((c == ' '  || c == ';') && cmd.empty()){
+                if((c == ' '  || c == ';' || c == '\n') && cmd.empty()){
                     continue;
                 } else if(c == ' '){
                     get_args = true;
-                } else if(c == ';'){
+                } else if(c == ';' || c == '\n'){
                     get_next = true;
                 } else{
                     cmd += c;
@@ -165,8 +165,12 @@ namespace process{
                 }
                 arg += c;
             } else if(c == ' '){
-                if(!arg.empty())
+                if(!arg.empty()){
+                    if(type == ARG_STR){
+                        arg = common::clear_str_format(arg);
+                    }
                     arg_stack.push(pair<arg_type, string>(type, arg));
+                }
                 type = ARG_VAR;
                 arg = "";
                 arg_error = false;
@@ -185,6 +189,9 @@ namespace process{
         }
 
         if(!arg.empty()){
+            if(type == ARG_STR){
+                arg = common::clear_str_format(arg);
+            }
             arg_stack.push(pair<arg_type, string>(type, arg));
         }
     }
@@ -209,76 +216,78 @@ namespace process{
 
         if(cmd == key_words[0]){ //exit
             cmd::cmd_exit(&arg_stack, arg_stack.size());
-        } else if(cmd == key_words[1]){ //putn
-            cmd::cmd_putn(&arg_stack, arg_stack.size());
-        } else if(cmd == key_words[2]){ //puts
-            cmd::cmd_puts(&arg_stack, arg_stack.size());
-        } else if(cmd == key_words[3]){ //push
+        } else if(cmd == key_words[1]){ //push
             cmd::cmd_push(&arg_stack, arg_stack.size());
-        } else if(cmd == key_words[4]){ //pop
+        } else if(cmd == key_words[2]){ //pop
             cmd::cmd_pop(&arg_stack, arg_stack.size());
-        } else if(cmd == key_words[5]){ //stack
+        } else if(cmd == key_words[3]){ //stack
             cmd::cmd_stack(&arg_stack, arg_stack.size());
-        } else if(cmd == key_words[6]){ //size
+        } else if(cmd == key_words[4]){ //size
             cmd::cmd_size(&arg_stack, arg_stack.size());
-        } else if(cmd == key_words[7]){ //ipush
+        } else if(cmd == key_words[5]){ //ipush
             cmd::cmd_ipush(&arg_stack, arg_stack.size());
-        } else if(cmd == key_words[8]){ //ipop
+        } else if(cmd == key_words[6]){ //ipop
             cmd::cmd_ipop(&arg_stack, arg_stack.size());
-        } else if(cmd == key_words[9]){ //index
+        } else if(cmd == key_words[7]){ //index
             cmd::cmd_index(&arg_stack, arg_stack.size());
-        } else if(cmd == key_words[10]){ //isize
+        } else if(cmd == key_words[8]){ //isize
             cmd::cmd_isize(&arg_stack, arg_stack.size());
-        } else if(cmd == key_words[11]){ //iswap
+        } else if(cmd == key_words[9]){ //iswap
             cmd::cmd_iswap(&arg_stack, arg_stack.size());
-        } else if(cmd == key_words[12]){ //add
+        } else if(cmd == key_words[10]){ //add
             cmd::std_cmd_call(&arg_stack, arg_stack.size(), &cmd::add_err, &cmd::add_prot, &cmd::add_prot_err, 2);
-        } else if(cmd == key_words[13]){ //sub
+        } else if(cmd == key_words[11]){ //sub
             cmd::cmd_sub(&arg_stack, arg_stack.size());
-        } else if(cmd == key_words[14]){ //mul
+        } else if(cmd == key_words[12]){ //mul
             cmd::std_cmd_call(&arg_stack, arg_stack.size(), &cmd::mul_err, &cmd::mul_prot, &cmd::mul_prot_err, 2);
-        } else if(cmd == key_words[15]){ //div
+        } else if(cmd == key_words[13]){ //div
             cmd::std_cmd_call(&arg_stack, arg_stack.size(), &cmd::div_err, &cmd::div_prot, &cmd::div_prot_err, 2);
-        } else if(cmd == key_words[16]){ //mod
+        } else if(cmd == key_words[14]){ //mod
             cmd::std_cmd_call(&arg_stack, arg_stack.size(), &cmd::mod_err, &cmd::mod_prot, &cmd::mod_prot_err, 2);
-        } else if(cmd == key_words[17]){ //typeof
+        } else if(cmd == key_words[15]){ //typeof
             cmd::std_cmd_call(&arg_stack, arg_stack.size(), &cmd::typeof_err, &cmd::typeof_prot, &cmd::typeof_prot_err, 1);
-        } else if(cmd == key_words[18]){ //at
+        } else if(cmd == key_words[16]){ //at
             cmd::std_cmd_call(&arg_stack, arg_stack.size(), &cmd::at_err, &cmd::at_prot, &cmd::at_prot_err, 2);
-        } else if(cmd == key_words[19]){ //rel
+        } else if(cmd == key_words[17]){ //rel
             cmd::std_cmd_call(&arg_stack, arg_stack.size(), &cmd::rel_err, &cmd::rel_prot, &cmd::rel_prot_err, 1);
-        } else if(cmd == key_words[20]){ //str
+        } else if(cmd == key_words[18]){ //str
             cmd::std_cmd_call(&arg_stack, arg_stack.size(), &cmd::str_err, &cmd::str_prot, &cmd::str_prot_err, 1);
-        } else if(cmd == key_words[21]){ //ceil
+        } else if(cmd == key_words[19]){ //ceil
             cmd::std_cmd_call(&arg_stack, arg_stack.size(), &cmd::ceil_err, &cmd::ceil_prot, &cmd::ceil_prot_err, 1);
-        } else if(cmd == key_words[22]){ //floor
+        } else if(cmd == key_words[20]){ //floor
             cmd::std_cmd_call(&arg_stack, arg_stack.size(), &cmd::floor_err, &cmd::floor_prot, &cmd::floor_prot_err, 1);
-        } else if(cmd == key_words[23]){ //round
+        } else if(cmd == key_words[21]){ //round
             cmd::std_cmd_call(&arg_stack, arg_stack.size(), &cmd::round_err, &cmd::round_prot, &cmd::round_prot_err, 1);
-        } else if(cmd == key_words[24]){ //process
+        } else if(cmd == key_words[22]){ //process
             cmd::cmd_process(&arg_stack, arg_stack.size());
             clearArgStack();
             processInput(cmd::process_output);
-        } else if(cmd == key_words[25]){ //is
+        } else if(cmd == key_words[23]){ //is
             cmd::std_cmd_call(&arg_stack, arg_stack.size(), &cmd::is_err, &cmd::is_prot, &cmd::is_prot_err, 3);
-        } else if(cmd == key_words[26]){ //cmp
+        } else if(cmd == key_words[24]){ //cmp
             cmd::std_cmd_call(&arg_stack, arg_stack.size(), &cmd::cmp_err, &cmd::cmp_prot, &cmd::cmp_prot_err, 2);
-        } else if(cmd == key_words[27]){ //if
+        } else if(cmd == key_words[25]){ //if
             cmd::cmd_if(&arg_stack, arg_stack.size());
             clearArgStack();
             processInput(cmd::if_output);
-        } else if(cmd == key_words[28]){ //getc
-            cmd::std_cmd_call(&arg_stack, arg_stack.size(), &cmd::getc_err, &cmd::getc_prot, &cmd::_prot_err, 0);
-        } else if(cmd == key_words[29]){ //geti
-            cmd::std_cmd_call(&arg_stack, arg_stack.size(), &cmd::geti_err, &cmd::geti_prot, &cmd::_prot_err, 0);
-        } else if(cmd == key_words[30]){ //gets
-            cmd::std_cmd_call(&arg_stack, arg_stack.size(), &cmd::gets_err, &cmd::gets_prot, &cmd::_prot_err, 1);
-        } else if(cmd == key_words[31]){ //getd
-            cmd::std_cmd_call(&arg_stack, arg_stack.size(), &cmd::getd_err, &cmd::getd_prot, &cmd::_prot_err, 0);
-        } else if(cmd == key_words[32]){ //getl
-            cmd::std_cmd_call(&arg_stack, arg_stack.size(), &cmd::getl_err, &cmd::getl_prot, &cmd::_prot_err, 0);
-        } else if(cmd == key_words[33]){ //getw
-            cmd::std_cmd_call(&arg_stack, arg_stack.size(), &cmd::getw_err, &cmd::getw_prot, &cmd::_prot_err, 0);
+        } else if(cmd == key_words[26]){ //put
+            cmd::cmd_put(&arg_stack, arg_stack.size());
+        } else if(cmd == key_words[27]){ //putl
+            cmd::cmd_putl(&arg_stack, arg_stack.size());
+        } else if(cmd == key_words[28]){ //get
+            cmd::std_cmd_call_std_err(&arg_stack, arg_stack.size(), &cmd::get_err, &cmd::get_prot);
+        } else if(cmd == key_words[29]){ //getl
+            cmd::std_cmd_call_std_err(&arg_stack, arg_stack.size(), &cmd::getl_err, &cmd::getl_prot);
+        } else if(cmd == key_words[30]){ //fput
+            cmd::cmd_fput(&arg_stack, arg_stack.size());
+        } else if(cmd == key_words[31]){ //fputl
+            cmd::cmd_fputl(&arg_stack, arg_stack.size());
+        } else if(cmd == key_words[32]){ //fwrite
+            cmd::cmd_fwrite(&arg_stack, arg_stack.size());
+        } else if(cmd == key_words[33]){ //fwritel
+            cmd::cmd_fwritel(&arg_stack, arg_stack.size());
+        } else if(cmd == key_words[34]){ //fread
+            cmd::std_cmd_call_std_err(&arg_stack, arg_stack.size(), &cmd::fread_err, &cmd::fread_prot, 1);
         } 
         else{
             printf("Unexcepted key word (this may be a deweloper/undoned key)\n");

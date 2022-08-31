@@ -3,6 +3,7 @@
 #include <common/common.hpp>
 
 #include <iostream>
+#include <fstream>
 #include <cmath>
 
 using namespace std;
@@ -24,7 +25,10 @@ namespace cmd{
             memory::var_type g = cmd_prot(arg_stack);
             if(*cmd_prot_err) return;
 
-            arg_stack->pop();
+            if(arg_prot_c != 0){
+                arg_stack->pop();
+            }
+
             if(arg_stack->top().first == ARG_INT){
                 id = stoll(arg_stack->top().second);
             } else if(arg_stack->top().first == ARG_VAR){
@@ -45,6 +49,11 @@ namespace cmd{
         } else{
             err->too_many_arg();
         }
+    }
+
+    void std_cmd_call_std_err(stack<pair<arg_type, string>>* arg_stack, size_t argc, cmd_error::Error* err, memory::var_type(*cmd_prot)(stack<pair<arg_type, string>>* arg_stack), int arg_prot_c){
+        _prot_err = false;
+        std_cmd_call(arg_stack, argc, err, cmd_prot, &_prot_err, arg_prot_c);
     }
 
     cmd_error::Error exit_err("(exit {code:INT})");
@@ -70,67 +79,6 @@ namespace cmd{
             }
         } else{
             exit_err.too_many_arg();
-        }
-    }
-
-    cmd_error::Error putn_err("(putn [v:REL])");
-    void cmd_putn(stack<pair<arg_type, string>>* arg_stack, size_t argc){
-        if(argc == 0){
-            putn_err.too_few_arg();
-        } else if(argc == 1){
-            memory::var_type buffer;
-            if(arg_stack->top().first == ARG_VAR){
-                buffer = memory::get_var(arg_stack->top().second);
-                if(memory::get_var_error){
-                    return;
-                }
-            } else{
-                buffer = memory::var_type((var_type)arg_stack->top().first, arg_stack->top().second);
-            }
-
-            if(buffer.first == VAR_INT || buffer.first == VAR_BOOL || buffer.first == VAR_TYPE || buffer.first == VAR_RELATION){
-                long long n = stoll(buffer.second);
-                printf("%lli", n);
-            } else if(buffer.first == VAR_DOT){
-                long double n = stold(buffer.second);
-                printf("%Lf", n);
-            } else{
-                putn_err.exc_rel();
-            }
-        } else{
-            putn_err.too_many_arg();
-        }
-    }
-
-    cmd_error::Error puts_err("(puts [s:STR])");
-    void cmd_puts(stack<pair<arg_type, string>>* arg_stack, size_t argc){
-        if(argc == 0){
-            puts_err.too_few_arg();
-        } else if(argc == 1){
-            if(arg_stack->top().first == ARG_STR){
-                string s = common::clear_str_format(arg_stack->top().second);
-                printf("%s", s.c_str());
-            } else if(arg_stack->top().first == ARG_VAR){
-                memory::var_type buffer = memory::get_var(arg_stack->top().second);
-                if(memory::get_var_error){
-                    return;
-                } else if(buffer.first == VAR_BOOL){
-                    printf("%s", (buffer.second == "0")?"false":"true");
-                } else if(buffer.first == VAR_TYPE){
-                    printf("%s", (buffer.second == "0")?"INT":((buffer.second == "1")?"DOT":((buffer.second == "2")?"STR":((buffer.second == "3")?"BOOL":((buffer.second == "4")?"TYPE":((buffer.second == "5")?"RELATION":"ANY"))))));
-                } else if(buffer.first == VAR_RELATION){
-                    printf("%s", (buffer.second == "0")?"equal":((buffer.second == "1")?"bigger":((buffer.second == "2")?"smaller":"not equal")));
-                } else if(buffer.first != VAR_STR){
-                    puts_err.exc_str();
-                    return;
-                } 
-                string s = common::clear_str_format(buffer.second);
-                printf("%s", s.c_str());
-            } else{
-                puts_err.exc_str();
-            }
-        } else{
-            puts_err.too_many_arg();
         }
     }
 
@@ -425,17 +373,15 @@ namespace cmd{
         }
 
         if(v1.first == VAR_STR){
-            string av = v1.second.substr(0, v1.second.length() - 1);
+            string av = v1.second;
             string bv = v2.second;
             if(v2.first == VAR_BOOL)
                 bv = (v2.second == "0")?"false":"true";
-            else if(v2.first == VAR_STR)
-                bv = v2.second.substr(1, v2.second.length() - 2);
             else if(v2.first == VAR_TYPE)
                 bv = (v2.second == "0")?"INT":((v2.second == "1")?"DOT":((v2.second == "2")?"STR":((v2.second == "3")?"BOOL":((v2.second == "4")?"TYPE":"ANY"))));
             else if(v2.first == VAR_RELATION)
                 bv = (v2.second == "0")?"equal":((v2.second == "1")?"bigger":((v2.second == "2")?"smaller":"not equal"));
-            return memory::var_type(VAR_STR, av + bv + "'");
+            return memory::var_type(VAR_STR, av + bv);
         } else if(v1.first == VAR_INT){
             if(v2.first == VAR_INT){
                 return memory::var_type(VAR_INT, to_string(stoll(v1.second) + stoll(v2.second)));
@@ -488,13 +434,13 @@ namespace cmd{
         }
 
         if(v1.first == VAR_STR){
-            string str = v1.second.substr(1, v1.second.length() - 2);
+            string str = v1.second;
             if(v2.first == VAR_INT){
                 unsigned long long begin = stoll(v2.second);
                 if(begin >= str.length()){
                     printf("Begin index cannot be biger than string length\n");
                 } else{
-                    return memory::var_type(VAR_STR, "'" + str.substr(begin) + "'");
+                    return memory::var_type(VAR_STR, str.substr(begin));
                 }
             } else{
                 sub_err.exc_int();
@@ -556,7 +502,7 @@ namespace cmd{
             }
 
             if(v1.first == VAR_STR){
-                string str = v1.second.substr(1, v1.second.length() - 2);
+                string str = v1.second;
                 if(v2.first == VAR_INT){
                     if(v3.first == VAR_INT){
                         unsigned long long begin = stoll(v2.second);
@@ -566,7 +512,7 @@ namespace cmd{
                         } else if(end >= str.length()){
                             printf("End index cannot be biger than string length\n");
                         } else{
-                            memory::_get = memory::var_type(VAR_STR, "'" + str.substr(begin, end) + "'");
+                            memory::_get = memory::var_type(VAR_STR, str.substr(begin, end));
                         }
                     } else{
                         sub_err.exc_int();
@@ -624,7 +570,7 @@ namespace cmd{
                 return;
             }
             if(str.first == VAR_STR){
-                string s = str.second.substr(1, str.second.length() - 2);
+                string s = str.second;
                 if(begin.first == VAR_INT && end.first == VAR_INT){
                     unsigned long long b = stoll(begin.second);
                     unsigned long long e = stoll(end.second);
@@ -633,7 +579,7 @@ namespace cmd{
                     } else if(e >= s.length()){
                         printf("End index cannot be biger than string length\n");
                     } else{
-                        memory::set_index(id, memory::var_type(VAR_STR, "'" + s.substr(b, e) + "'"));
+                        memory::set_index(id, memory::var_type(VAR_STR, s.substr(b, e)));
                     }
                 } else{
                     sub_err.exc_int();
@@ -677,13 +623,13 @@ namespace cmd{
 
         if(v1.first == VAR_STR){
             if(v2.first == VAR_INT){
-                string get = "'";
+                string get = "";
                 long long times = stoll(v2.second);
                 while(times > 0){
-                    get += v1.second.substr(1, v1.second.length() - 2);
+                    get += v1.second;
                     times--;
                 }
-                return memory::var_type(VAR_STR, get + "'");
+                return memory::var_type(VAR_STR, get + "");
             } else{
                 mul_err.exc_int();
             }
@@ -874,7 +820,7 @@ namespace cmd{
         arg_stack->pop();
 
         if(arg_stack->top().first == ARG_STR){
-            s = common::clear_str_format(arg_stack->top().second);
+            s = arg_stack->top().second;
         } else if(arg_stack->top().first == ARG_VAR){
             memory::var_type x = memory::get_var(arg_stack->top().second);
             if(memory::get_var_error){
@@ -883,7 +829,7 @@ namespace cmd{
             }
 
             if(x.first == VAR_STR){
-                s = common::clear_str_format(x.second);
+                s = x.second;
             } else{
                 at_err.exc_int();
                 at_prot_err = true;
@@ -898,7 +844,7 @@ namespace cmd{
         if(index >= s.length()){
             printf("Index cannot be bigger than s's length\n");
         } else{
-            return memory::var_type(VAR_STR, string("\'") + s[index] + "\'");
+            return memory::var_type(VAR_STR, string() + s[index]);
         }
 
         at_prot_err = true;
@@ -927,7 +873,7 @@ namespace cmd{
                 return v;
             case VAR_STR:
                 try{
-                    return memory::var_type(VAR_DOT, to_string(stold(common::clear_str_format(v.second))));
+                    return memory::var_type(VAR_DOT, to_string(stold(v.second)));
                 } catch(const exception& e){
                     printf("Conversation error\nWhat: %s\n", e.what());
                     rel_prot_err = true;
@@ -964,15 +910,14 @@ namespace cmd{
         switch(v.first){
             case VAR_INT:
             case VAR_DOT:
-                return memory::var_type(VAR_STR, string("\'") + v.second + "\'");
             case VAR_STR:
                 return memory::var_type(VAR_STR, v.second);
             case VAR_BOOL:
-                return memory::var_type(VAR_STR, string("\'") + ((v.second == "0")?"false":"true") + "\'");
+                return memory::var_type(VAR_STR, ((v.second == "0")?"false":"true"));
             case VAR_TYPE:
-                return memory::var_type(VAR_STR, string("\'") + ((v.second == "0")?"INT":((v.second == "1")?"DOT":((v.second == "2")?"STR":((v.second == "3")?"BOOL":((v.second == "4")?"TYPE":((v.second == "5")?"RELATION":"ANY")))))) + "\'");
+                return memory::var_type(VAR_STR, ((v.second == "0")?"INT":((v.second == "1")?"DOT":((v.second == "2")?"STR":((v.second == "3")?"BOOL":((v.second == "4")?"TYPE":((v.second == "5")?"RELATION":"ANY")))))));
             case VAR_RELATION:
-                return memory::var_type(VAR_STR, string("\'") + ((v.second == "0")?"equal":((v.second == "1")?"bigger":((v.second == "2")?"smaller":"not equal"))) + "\'");
+                return memory::var_type(VAR_STR, ((v.second == "0")?"equal":((v.second == "1")?"bigger":((v.second == "2")?"smaller":"not equal"))));
             default:
                 printf("An error\n");
         }
@@ -1076,7 +1021,7 @@ namespace cmd{
                 process_err.exc_str();
                 return;
             }
-            process_output = common::clear_str_format(process_output);
+            process_output = process_output;
         } else{
             process_err.too_many_arg();
         }
@@ -1234,8 +1179,6 @@ namespace cmd{
                 if_err.exc_str();
                 return;
             }
-            
-            then = common::clear_str_format(then);
 
             arg_stack->pop();
             if(arg_stack->top().first == ARG_VAR){
@@ -1273,8 +1216,6 @@ namespace cmd{
                 if_err.exc_str();
                 return;
             }
-            
-            el = common::clear_str_format(el);
 
             arg_stack->pop();
             if(arg_stack->top().first == ARG_STR){
@@ -1292,8 +1233,6 @@ namespace cmd{
                 if_err.exc_str();
                 return;
             }
-            
-            then = common::clear_str_format(then);
 
             arg_stack->pop();
             if(arg_stack->top().first == ARG_VAR){
@@ -1317,89 +1256,289 @@ namespace cmd{
         }
     }
 
-    cmd_error::Error getc_err("(getc {id:INT})");
-    memory::var_type getc_prot(std::stack<std::pair<defs::arg_type, std::string>>* arg_stack){
-        _prot_err = false;
-
-        char c = getc(stdin);
-        return memory::var_type(VAR_STR, string("\'") + c + "\'");
-    }
-
-    cmd_error::Error geti_err("(geti {id:INT})");
-    memory::var_type geti_prot(std::stack<std::pair<defs::arg_type, std::string>>* arg_stack){
-        _prot_err = false;
-
-        long long c = 0;
-        scanf("%lli", &c);
-        return memory::var_type(VAR_INT, to_string(c));
-    }
-
-    cmd_error::Error gets_err("(gets {id:INT} [length:INT])");
-    memory::var_type gets_prot(std::stack<std::pair<defs::arg_type, std::string>>* arg_stack){
-        _prot_err = false;
-
-        long long length = 0;
-
-        if(arg_stack->top().first == ARG_INT){
-            length = stoll(arg_stack->top().second);
-        } else if(arg_stack->top().first == ARG_VAR){
-            memory::var_type g = memory::get_var(arg_stack->top().second);
-            if(g.first == VAR_INT){
-                length = stoll(g.second);
+    cmd_error::Error put_err("(put [v:ANY])");
+    void cmd_put(stack<pair<arg_type, string>>* arg_stack, size_t argc){
+        if(argc == 0){
+            put_err.too_few_arg();
+        } else if(argc == 1){
+            string v = "";
+            if(arg_stack->top().first == ARG_VAR){
+                v = memory::get_var(arg_stack->top().second).second;
+                if(memory::get_var_error) return;
             } else{
-                gets_err.exc_int();
+                v = arg_stack->top().second;
+            }
+            printf("%s", v.c_str());
+        } else{
+            put_err.too_many_arg();
+        }
+    }
+
+    cmd_error::Error putl_err("(putl [v:ANY])");
+    void cmd_putl(stack<pair<arg_type, string>>* arg_stack, size_t argc){
+        if(argc == 0){
+            put_err.too_few_arg();
+        } else if(argc == 1){
+            string v = "";
+            if(arg_stack->top().first == ARG_VAR){
+                v = memory::get_var(arg_stack->top().second).second;
+                if(memory::get_var_error) return;
+            } else{
+                v = arg_stack->top().second;
+            }
+            printf("%s\n", v.c_str());
+        } else{
+            put_err.too_many_arg();
+        }
+    }
+
+    cmd_error::Error get_err("(get {id:INT})");
+    memory::var_type get_prot(stack<pair<arg_type, string>>* arg_stack){
+        string val = "";
+        char buf = (char)getc(stdin);
+        
+        while(buf == ' ' || buf == '\t' || buf == '\n'){
+            buf = (char)getc(stdin);
+        }
+
+        while(buf != ' ' && buf != '\t' && buf != '\n'){
+            val += buf;
+            buf = (char)getc(stdin);
+        }
+        return memory::var_type(VAR_STR, val);
+    }
+
+    cmd_error::Error getl_err("(getl {id:INT})");
+    memory::var_type getl_prot(stack<pair<arg_type, string>>* arg_stack){
+        string i = "";
+        getline(cin, i);
+        return memory::var_type(VAR_STR, i);
+    }
+
+    cmd_error::Error fput_err("(fput [path:STR] [v:ANY])");
+    void cmd_fput(stack<pair<arg_type, string>>* arg_stack, size_t argc){
+        if(argc <= 1){
+            fput_err.too_few_arg();
+        } else if(argc == 2){
+            string v = "";
+            string path = "";
+
+            if(arg_stack->top().first == ARG_VAR){
+                v = memory::get_var(arg_stack->top().second).second;
+                if(memory::get_var_error) return;
+            } else{
+                v = arg_stack->top().second;
+            }
+
+            arg_stack->pop();
+            if(arg_stack->top().first == ARG_VAR){
+                auto p = memory::get_var(arg_stack->top().second);
+                if(memory::get_var_error) return;
+                else if(p.first != VAR_STR){
+                    fput_err.exc_str();
+                    return;
+                }
+                path = p.second;
+            } else if(arg_stack->top().first == ARG_STR){
+                path = arg_stack->top().second;
+            } else{
+                fput_err.exc_str();
+                return;
+            }
+
+            fstream file;
+            file.open(path, ios::out | ios::app);
+            if(!file.good()){
+                printf("Failed to open file (\'%s\')\n", path.c_str());
+                return;
+            }
+
+            file << v;
+            file.close();
+        } else{
+            fput_err.too_many_arg();
+        }
+    }
+
+    cmd_error::Error fputl_err("(fputl [path:STR] [v:ANY])");
+    void cmd_fputl(stack<pair<arg_type, string>>* arg_stack, size_t argc){
+        if(argc <= 1){
+            fputl_err.too_few_arg();
+        } else if(argc == 2){
+            string v = "";
+            string path = "";
+
+            if(arg_stack->top().first == ARG_VAR){
+                v = memory::get_var(arg_stack->top().second).second;
+                if(memory::get_var_error) return;
+            } else{
+                v = arg_stack->top().second;
+            }
+
+            arg_stack->pop();
+            if(arg_stack->top().first == ARG_VAR){
+                auto p = memory::get_var(arg_stack->top().second);
+                if(memory::get_var_error) return;
+                else if(p.first != VAR_STR){
+                    fputl_err.exc_str();
+                    return;
+                }
+                path = p.second;
+            } else if(arg_stack->top().first == ARG_STR){
+                path = arg_stack->top().second;
+            } else{
+                fputl_err.exc_str();
+                return;
+            }
+
+            fstream file;
+            file.open(path, ios::out | ios::app);
+            if(!file.good()){
+                printf("Failed to open file (\'%s\')\n", path.c_str());
+                return;
+            }
+
+            file << v << endl;
+            file.close();
+        } else{
+            fputl_err.too_many_arg();
+        }
+    }
+
+    cmd_error::Error fwrite_err("(fwrite [path:STR] [v:ANY])");
+    void cmd_fwrite(stack<pair<arg_type, string>>* arg_stack, size_t argc){
+        if(argc <= 1){
+            fwrite_err.too_few_arg();
+        } else if(argc == 2){
+            string v = "";
+            string path = "";
+
+            if(arg_stack->top().first == ARG_VAR){
+                v = memory::get_var(arg_stack->top().second).second;
+                if(memory::get_var_error) return;
+            } else{
+                v = arg_stack->top().second;
+            }
+
+            arg_stack->pop();
+            if(arg_stack->top().first == ARG_VAR){
+                auto p = memory::get_var(arg_stack->top().second);
+                if(memory::get_var_error) return;
+                else if(p.first != VAR_STR){
+                    fwrite_err.exc_str();
+                    return;
+                }
+                path = p.second;
+            } else if(arg_stack->top().first == ARG_STR){
+                path = arg_stack->top().second;
+            } else{
+                fwrite_err.exc_str();
+                return;
+            }
+
+            fstream file;
+            file.open(path, ios::out);
+            if(!file.good()){
+                printf("Failed to open file (\'%s\')\n", path.c_str());
+                return;
+            }
+
+            file << v;
+            file.close();
+        } else{
+            fwrite_err.too_many_arg();
+        }
+    }
+
+    cmd_error::Error fwritel_err("fwritel [path:STR] [v:ANY])");
+    void cmd_fwritel(stack<pair<arg_type, string>>* arg_stack, size_t argc){
+        if(argc <= 1){
+            fwritel_err.too_few_arg();
+        } else if(argc == 2){
+            string v = "";
+            string path = "";
+
+            if(arg_stack->top().first == ARG_VAR){
+                v = memory::get_var(arg_stack->top().second).second;
+                if(memory::get_var_error) return;
+            } else{
+                v = arg_stack->top().second;
+            }
+
+            arg_stack->pop();
+            if(arg_stack->top().first == ARG_VAR){
+                auto p = memory::get_var(arg_stack->top().second);
+                if(memory::get_var_error) return;
+                else if(p.first != VAR_STR){
+                    fwritel_err.exc_str();
+                    return;
+                }
+                path = p.second;
+            } else if(arg_stack->top().first == ARG_STR){
+                path = arg_stack->top().second;
+            } else{
+                fwritel_err.exc_str();
+                return;
+            }
+
+            fstream file;
+            file.open(path, ios::out);
+            if(!file.good()){
+                printf("Failed to open file (\'%s\')\n", path.c_str());
+                return;
+            }
+
+            file << v << endl;
+            file.close();
+        } else{
+            fwritel_err.too_many_arg();
+        }
+    }
+
+    cmd_error::Error fread_err("(fread {id:INT} [path:STR])");
+    memory::var_type fread_prot(stack<pair<arg_type, string>>* arg_stack){
+        string path = "";
+
+        if(arg_stack->top().first == ARG_VAR){
+            auto p = memory::get_var(arg_stack->top().second);
+            if(memory::get_var_error){
+                _prot_err = true;
+                return memory::var_type();
+            } else if(p.first != VAR_STR){
+                fread_err.exc_str();
                 _prot_err = true;
                 return memory::var_type();
             }
+            path = p.second;
+        } else if(arg_stack->top().first == ARG_STR){
+            path = arg_stack->top().second;
         } else{
-            gets_err.exc_int();
+            fread_err.exc_str();
             _prot_err = true;
             return memory::var_type();
         }
 
-        if(length <= 0){
-            printf("Length must be bigger than 0\n");
-        } else{
-            char* inp = new char[length];
+        string val = "";
 
-            scanf((string("%") + to_string(length) + "s").c_str(), inp);
-            string input = string(inp);
-
-            delete[] inp;
-            
-            return memory::var_type(VAR_STR, string("\'") + input + "\'");
+        fstream file;
+        file.open(path, ios::in);
+        if(!file.good()){
+            printf("Failed to open file (\'%s\')\n", path.c_str());
+            _prot_err = true;
+            return memory::var_type();
         }
 
-        _prot_err = true;
-        return memory::var_type();
-    }
+        string line = "";
+        while(getline(file, line)){
+            val += "\n" + line;
+        }
 
-    cmd_error::Error getd_err("(getd {id:INT})");
-    memory::var_type getd_prot(std::stack<std::pair<defs::arg_type, std::string>>* arg_stack){
-        _prot_err = false;
+        file.close();
 
-        long double c = 0;
-        scanf("%Le", &c);
-        return memory::var_type(VAR_DOT, to_string(c));
-    }
+        if(!val.empty()){
+            val = val.substr(1);
+        }
 
-    cmd_error::Error getl_err("(getl {id:INT})");
-    memory::var_type getl_prot(std::stack<std::pair<defs::arg_type, std::string>>* arg_stack){
-        _prot_err = false;
-
-        string inp = "";
-        getline(cin, inp);
-        return memory::var_type(VAR_STR, string("\'") + inp + "\'");
-    }
-
-    cmd_error::Error getw_err("(getw {id:INT})");
-    memory::var_type getw_prot(std::stack<std::pair<defs::arg_type, std::string>>* arg_stack){
-        _prot_err = false;
-
-        string inp = "";
-        cin.clear();
-        cin.ignore();
-        cin >> inp;
-        return memory::var_type(VAR_STR, string("\'") + inp + "\'");
+        return memory::var_type(VAR_STR, val);
     }
 }
